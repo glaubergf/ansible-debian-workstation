@@ -1,0 +1,9 @@
+---
+- name: Removendo pacotes
+  apt:
+    name: "{{ uninstall_app }}"
+    state: absent
+    purge: yes
+    autoclean: yes
+    autoremove: yes
+  tags: uninstall_app

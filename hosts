@@ -1,0 +1,7 @@
+[local]
+#localhost ansible_connection=local ansible_python_interpreter=python3 gather_facts=false
+
+## nome_do_host ansible_host=ip.do.host
+#dell-inspiron-n5010 ansible_host=192.168.0.103
+debian-stable ansible_host=192.168.122.128
+

@@ -1,0 +1,41 @@
+---
+#----- Remove User
+#- name: Removendo Conta do(s) Usuario(s)
+#  user:
+#    name: "{{ item }}"
+#    state: absent
+#    remove: yes
+#  with_items: "{{ new_user }}"
+#  tags: remove_user
+#-----
+
+- name: Criando Conta de Usuario(s)
+  user:
+    name: "{{ item.0 }}"
+    uid: "{{ item.0.uid | default(omit, True) }}"
+    groups: sudo #Adiciona o usuario ao grupo sudo dando o privilegio de root
+    comment: "{{ item.1 }}"
+    password: "{{ 'zaq1' | string | password_hash('sha512') }}"
+    create_home: yes
+    state: present
+    append: yes
+    shell: "/bin/bash"
+    update_password: on_create
+  with_together:
+    - "{{ new_user }}"
+    - "{{ comment_user }}"
+  register: user_created
+  tags: create_user
+
+- name: Forca o Usuario a Alterar a Senha no Primeiro Login
+  shell: chage -d 0 "{{ item }}"
+  with_items: "{{ new_user }}"
+  tags: create_user
+
+#- name: Usuario(s) Criado(s)
+#  debug:
+#    msg: O usuario "{{ item }}" foi criado com UID "uid" .
+#  with_items: "{{ new_user }}"
+#  tags: create_user2 ####
+
+#- name: Add SSH Keys | Add authorized key for ssh key authentication

@@ -1,0 +1,9 @@
+---
+- hosts: local
+  become: yes
+  roles:
+  - { role: add-repo, tags: add_repo }
+  - { role: install-app, tags: install_app }
+  - { role: uninstall-app, tags: uninstall_app }
+  - { role: install-loffice, tags: install_loffice}
+  - { role: create-user, tags: create_user}

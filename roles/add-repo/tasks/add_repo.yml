@@ -1,0 +1,48 @@
+---
+- name: Adiconando Repositorios "contrib" e "non-free"
+  copy:
+    src: sources.list
+    dest: /etc/apt/sources.list
+    owner: root
+    group: root
+    mode: '0644'
+    checksum: 534bee4a7b1dd55d84f818f37c2f3f0556445af3
+    #backup: yes
+  tags: add_repo
+
+- name: Adicionando Repositorio Flathub Flatpak
+  flatpak_remote:
+    name: flathub
+    state: present
+    flatpakrepo_url: https://dl.flathub.org/repo/flathub.flatpakrepo
+    method: system
+  tags: add_repo
+
+- name: Instalacao GPG-Key
+  apt_key:
+    keyserver: keyserver.ubuntu.com
+    id: "{{ item }}"
+  loop: "{{ id_gpg }}"
+  tags: add_repo
+
+- name: Adicionando Keys para Validacao dos Repositorios Adicionais
+  apt_key:
+    url: "{{ item }}"
+    state: present
+  loop: "{{ apt_key_urls }}"
+  tags: add_repo
+
+- name: Adiconando URLs dos Repositorios Adicionais
+  apt_repository:
+    repo: "{{ item.url }}"
+    state: present
+    filename: "{{ item.filename }}"
+    mode: '0644'
+    update_cache: no
+  loop: "{{ apt_repo_urls }}" 
+  tags: add_repo
+
+- name: Atualizando Repositorios
+  apt:
+    update-cache: yes
+  tags: add_repo

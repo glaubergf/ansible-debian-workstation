@@ -1,0 +1,9 @@
+---
+# vars file for uninstall-app
+
+uninstall_app:
+  - exfalso
+  - parole
+  - atril
+  - quodlibet
+  - xterm
