@@ -3,17 +3,17 @@
 
 new_user:
   - glauber.fonseca
-  - gabriel
-  - larissa
+#  - gabriel
+#  - larissa
 
 comment_user:
   - Glauber G Fonseca
-  - Gabriel BF
-  - Larissa BF
+#  - Gabriel BF
+#  - Larissa BF
 
 #password:
-#  - 123qwe
-#  - 123qwe
+#  - zaq1
+#  - zaq1
 
 #password_user:
 #  - passwd_user.yml 

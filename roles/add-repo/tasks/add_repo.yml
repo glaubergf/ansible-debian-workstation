@@ -10,12 +10,25 @@
     #backup: yes
   tags: add_repo
 
+- name: Atualizando Repositorios
+  apt:
+    update-cache: yes
+  tags: add_repo
+
+- name: Instalando o flatpak
+  apt:
+    name: flatpak
+    state: present
+  tags: add_repo
+
 - name: Adicionando Repositorio Flathub Flatpak
   flatpak_remote:
+    executable: "flatpak"
     name: flathub
     state: present
     flatpakrepo_url: https://dl.flathub.org/repo/flathub.flatpakrepo
     method: system
+  register: fp
   tags: add_repo
 
 - name: Instalacao GPG-Key

@@ -35,7 +35,6 @@ apps:
   - xscreensaver-gl
   - xscreensaver-gl-extra
   - redshift
-  - flatpak
   - p7zip-full
   - p7zip-rar
   - unrar
@@ -67,6 +66,7 @@ apps:
   - whois #contem o mkpassd
   - tldr
   - neofetch
+  - ethstatus
 
 flatpak_apps:
   - com.getpostman.Postman

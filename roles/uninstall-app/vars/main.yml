@@ -7,3 +7,4 @@ uninstall_app:
   - atril
   - quodlibet
   - xterm
+  - libreoffice-*

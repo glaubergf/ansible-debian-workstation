@@ -13,7 +13,7 @@
   user:
     name: "{{ item.0 }}"
     uid: "{{ item.0.uid | default(omit, True) }}"
-    groups: sudo #Adiciona o usuario ao grupo sudo dando o privilegio de root
+    groups: sudo
     comment: "{{ item.1 }}"
     password: "{{ 'zaq1' | string | password_hash('sha512') }}"
     create_home: yes
