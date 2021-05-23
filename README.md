@@ -23,9 +23,6 @@ Nesse projeto, foi adicionado para o repositório do Debian a seção contrib e 
 
 Altere as configiurações implantadas na playbook de acordo com as necessidades para o uso do sistema.
 
-  - { role: conf-all, tags: conf_all }
-  - { role: reboot-system, tags: reboot_system }
-
 ## A Automação
 
 Veja uma breve descrição da task dentro de cada role:
