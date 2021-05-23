@@ -5,6 +5,8 @@
   - { role: add-repo, tags: add_repo }
   - { role: uninstall-app, tags: uninstall_app }
   - { role: install-app, tags: install_app }
-  - { role: install-loffice, tags: install_loffice}
-  - { role: create-user, tags: create_user}
-  - { role: reboot-system, tags: reboot_system}
+  - { role: install-loffice, tags: install_loffice }
+  - { role: create-user, tags: create_user }
+  - { role: aws-cli, tags: aws_cli }
+  - { role: conf-all, tags: conf_all }
+  - { role: reboot-system, tags: reboot_system }
