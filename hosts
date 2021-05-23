@@ -1,7 +1,8 @@
 [local]
 dell-inspiron-n5010 ansible_host=192.168.0.104
+#debian-stable ansible_host=192.168.122.128
 
 [local:vars]
 ansible_user=mcnd2
-ansible_password=passwdfake
-ansible_become_password=passwdfake
+ansible_password=xxxxxxxx
+ansible_become_password=xxxxxxxx
