@@ -1,0 +1,2 @@
+%glauber.fonseca ALL=NOPASSWD:SETENV: /usr/bin/openfortigui --start-vpn *
+%mcnd2 ALL=NOPASSWD:SETENV: /usr/bin/openfortigui --start-vpn *
