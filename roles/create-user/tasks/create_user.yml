@@ -31,11 +31,3 @@
   shell: chage -d 0 "{{ item }}"
   with_items: "{{ new_user }}"
   tags: create_user
-
-#- name: Usuario(s) Criado(s)
-#  debug:
-#    msg: O usuario "{{ item }}" foi criado com UID "uid" .
-#  with_items: "{{ new_user }}"
-#  tags: create_user2 ####
-
-#- name: Add SSH Keys | Add authorized key for ssh key authentication
