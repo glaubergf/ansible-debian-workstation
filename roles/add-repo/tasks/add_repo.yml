@@ -7,7 +7,7 @@
     group: root
     mode: '0644'
     checksum: 534bee4a7b1dd55d84f818f37c2f3f0556445af3
-    #backup: yes
+    backup: yes
   tags: add_repo
 
 - name: Atualizando Repositorios
@@ -28,7 +28,6 @@
     state: present
     flatpakrepo_url: https://dl.flathub.org/repo/flathub.flatpakrepo
     method: system
-  register: fp
   tags: add_repo
 
 - name: Instalacao GPG-Key
