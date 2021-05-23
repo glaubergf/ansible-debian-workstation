@@ -1,90 +1,150 @@
 ---
-Projeto: ansible-vagrante-debian-zabbix
-Descrição: O objetivo desse projeto é provisionar uma ou mais VMs, assim podendo ser 
-           modificadas as suas variáveis nos parâmetros que atendam as suas espectativas.
+Projeto: ansible-debian-workstation
+Descrição: O objetivo desse projeto é automatizar a configuração na pós-instalação do sistema 
+           GNU/Linux Debian (debian-10.9.0-amd64-xfce-CD-1.iso), assim nos poupando tempo e de
+           todo trabalho braçal.
 Autor: Glauber GF (mcnd2)
-Atualização: 2021-05-02
+Atualização: 2021-05-23
 ---
 
-![Image](https://github.com/glaubergf/ansible-vagrant-debian-zabbix/blob/main/start_zabbix.png) 
+![Image](https://github.com/glaubergf/ansible-debian-workstation/blob/main/pictures/rio-de-janeiro-swirl-debian.jpg) 
 
-# Instalar e Configurar o Zabbix com o Ansible
+# Pós-instalação do Debian com Ansible
 
-O **Zabbix** é um software de nível corporativo ideal para o monitoramento em tempo real de milhões de métricas coletadas de dezenas de milhares de servidores, máquinas virtuais e dispositivos de rede, além de ser de código aberto é também gratuito.
+O objetivo desse projeto é executar após uma instalação do Debian com Ansible instalando pacotes, removendo outros, adicionando repositórios, criando usuário etc, assim nos poupando tempo e de todo trabalho braçal.
 
-O **Ansible** trabalha com os conceitos de inventário (_lista de máquinas que serão gerenciadas_), playbooks (_comandos ou passo-a-passo a ser executado_) e roles (_modularização do código_). Atualmente o Ansible pertence a **Red Hat**.
+Veja o post desse projeto no **[SempreUpdate](https://sempreupdate.com.br/pos-instalacao-do-debian-com-ansible/)**.
 
-## O Host
+## O Projeto
 
-Para esse projeto local, foi utilizado o Host com o Sistema Operacional **[Debian 10 Buster](https://www.debian.org/)** e realizado a instalação dos seguintes programas (ferramentas) para a execução do projeto:
+Esse projeto foi desenvolvido para automatizar uma pós-instalaçãodo do **[Debian](https://www.debian.org/)** 10.9 (Stable Buster) em um Notebook Dell Inspiron N5010 core i5 de 1ª geração com 10 anos idade.
 
-**[Vagrant](https://www.vagrantup.com/docs)** para provisionar a(s) VM(s) (_máquina virtual_) com o **Debian Buster**. Lembrando que o _Vagrantfile_ utilizado nesse projeto está configurado para o uso do provider **[libvirt](https://libvirt.org/)** com o gerenciador gráfico **[Virtual Machine Manager](https://virt-manager.org/)**.
+Nesse projeto, foi adicionado para o repositório do Debian a seção contrib e não-free mais outros repositórios de terceiros para uso de aplicaçoes pertinente as necessidades do usuário e também as configurações no sistema para uso de VPN e mudanças no layout do Xfce4.
 
-**[Ansible](https://docs.ansible.com/ansible/latest/index.html)** para executar o gerenciamento de automação na máquina alvo, a VM com o Debian.
+Altere as configiurações implantadas na playbook de acordo com as necessidades para o uso do sistema.
 
-O Artigo que faz referência a este Projeto esta no **[SempreUpdate](https://sempreupdate.com.br/como-instalar-e-configurar-o-zabbix-5-no-debian-10-com-ansible/)**.
+  - { role: conf-all, tags: conf_all }
+  - { role: reboot-system, tags: reboot_system }
 
 ## A Automação
 
 Veja uma breve descrição da task dentro de cada role:
 
-Na role **config_initial** é executado o ajuste do timezone, alterado o idioma do sistema, alterado o layout do teclado, instalado, configurado e habilitado o ntp.
+Na role **add-repo** é executado a inclusão da seção _contrib_ e _non-free_ no repositórios do Debian. Adicionado também outros reporitórios de terceiros para uso de aplicações.
 
 * tasks:
 
 ```
-Ajustando o timezone do sistema;
-Alterando o idioma do sistema;
-Alterando o layout do teclado do sistema;
-Removendo arquivo '/var/lib/dpkg/lock-frontend' se existir;
-Executando 'apt-get update';
-Instalando o ntp / ntpdate;
-Parando o ntp;
-Copiando o arquivo de configuração do ntp;
-Ajustando a hora e habilitando o ntp;
-Iniciando o ntp.
+Adiconando Repositorios "contrib" e "non-free";
+Atualizando Repositorios;
+Instalando o flatpak;
+Adicionando Repositorio Flathub Flatpak;
+Instalacao GPG-Key;
+Adicionando Keys para Validacao dos Repositorios Adicionais;
+Adiconando URLs dos Repositorios Adicionais;
+Atualizando Repositorios.
 ```
 
-Na role **db-mariadb** é executado a instalação e configuração necessária para o banco de dados mariadb.
+Na role **uninstall-app** é executado a remoção de algumas aplicações não necessária para para o uso e alterações de outras.
 
 * tasks:
 
 ```
-Instalando o MariaDB Database Server;
-Verificando se o MariaDB está em execução e inicia no boot;
-Conectando ao servidor usando 'login_unix_socket';
-Removendo contas de usuários 'anônimos' para localhost;
-Removendo usuários 'zabbix' para o localhost se existir;
-Removendo o MySQL 'test database';
-Altera o plugin de autenticação do usuário 'root' do MariaDB para mysql_native_password;
-Privilégios de liberação para usuário 'root';
-Criando usuário 'zabbix' para o MariaDB;
-Criando banco de dados com nome 'zabbix'.
+Removendo pacotes.
 ```
 
-Na role **mon-zabbix** é executado a adição do repositório zabbix, a instalação e configuração necessárias para que o zabbix carregue sem problemas.
+Na role **install-app** é executado a instalação de aplicações do repositório do Debian bem como do Flatpak e pacotes '.deb' de downlaod da internet.
 
 * tasks:
 
 ```
-Adicionando o repositório do Zabbix Server;
-Executando o update nos repositórios;
-Instalando o Zabbix com frontend e suporte ao banco de dados MariaDB/MySQL;
-Importando arquivo.sql similar para mariadb/mysql -u <user> -p <password> < arquivo.sql;
-Configuração do zabbix /etc/zabbix/zabbix_server.conf e inserindo os dados de conexão do banco;
-Configurando timezone do Nginx para os parâmetros que o Zabbix usa;
-Reiniciando o Zabbix Server, Zabbix Agente, Nginx e PHP;
-Configurando o Nginx;
-Mudando a porta default do Nginx para não colidir com a do Zabbix;
-Alterando permissões no diretório raiz do Zabbix;
-Reiniciando o Nginx.
+Instalando Pacotes do Repositorio;
+Instalando Pacotes Flatpak;
+Instalando Pacotes ".deb" da Internet.
 ```
 
-Explore as _tasks_ e sinta-se a vontade para melhorá-la.
+Na role **install-loffice** é executado o download da versão do LibreOffice stable na versão 7.0.5, descompactando e instalando a mesma. Por esse motivo que o libreoffice foi removido na task _unistall-app_.
+
+* tasks:
+
+```
+Download do LibreOffice;
+Descompactando Pacotes do LibreOffice;
+Criando uma Lista de Pacotes .deb do LibreOffice;
+Criando Variavel da Lista dos Pacotes do LibreOffice;
+Listando os Pacotes com DEBUG;
+Instalando Pacotes .deb do LibreOffice.
+```
+
+Na role **create-user** é executado a criação do usuário para uso do sistema necessitando alterar a senha padrão no primeiro acesso.
+
+* tasks:
+
+```
+Criando Conta de Usuario(s);
+Forca o Usuario a Alterar a Senha no Primeiro Login.
+```
+
+Na role **aws-cli** é executado a instalação de pacotes necessários para acesso a AWS bem como exeção de comandos aws.
+
+**Nota:**
+Para executar a role _'aws-cli'_, lembre-se de executar o ansible-vault pois há informações sensíveis nas variáveis assim deixando-as criptografadas.
+
+* Exemplos de comandos:
+
+```
+$ ansible-vault encrypt roles/var/main.yml
+$ ansible-vault decrypt role/aws-cli/var/main.yml
+$ ansible-playbook --ask-vault-pass -i hosts main.yml -t aws_cli
+```
+
+Lembre-se que as informações nas referidas variáveis nesse projeto são ficitícias, por esse motivo esta descriptografada.
+
+* tasks:
+
+```
+Instalando o Python3 PIP;
+Instalando o boto via PIP;
+Instalando a AWS CLI;
+Executando AWS Configure inserindo Id, Key, Region e formato no profile Default
+Criando o diretório ~/.ssh caso nao exista;
+Copiando a chave ssh de acesso na AWS;
+Configurando o .bashrc awsgo/alog (SSH) e data no historico.
+```
+
+Na role **conf-all** é executado algumas configurações no sistema como alterara permissão de conexão com a VPN, backup e modificação do layout do xfce4 com uma template, cópia de diretório específico replicando no seu nome com a data, e ainda download de temas de ícones, fontes e imagens para área de trabalho descompactando-as e inserindo para ser identificadas no sistema.
+
+* tasks:
+
+```
+Adicionando permissão para o usuario conectar a VPN com o OpenFortiGUI;
+Backup do .config/xfce4 do usuário;
+Copiando template do Painel do xfce4;
+Download dos pacotes de temas de icones Ardis e Nitrux;
+Descompactando os pacotes de temas de icones Ardis e Nitrux;
+Copiando os diretorios de temas de icones para o /usr/share/icons;
+Download do pacote de fontes Ubuntu;
+Descompactando o pacote de fontes Ubuntu;
+Copiando os diretorios de fontes Ubuntu para o /usr/share/fonts;
+Criando diretorio ~/Imagens/wallpaper se não existir;
+Download papel de parede Pexels;
+Copiando diretorio BEMOBI;
+continuando ...
+```
+
+Na role **rebbot-system** é executado o reboot no sistema.
+
+* tasks:
+
+```
+Reiniciando o sistema com todos os padrões.
+```
 
 ## Contribuindo
 
-Esse foi um projeto inicial de estudo e para contribuição de melhorias no código, comente ou crie uma issue no projeto com as devidas alterações deixando com a explicação e assim que for possível será executado o commit e o merge para a branch main.
+Esse projeto fica disponível para a comunidade utilizar de acordo com a necessidades para cada vertente.
+
+Para contribuições de melhorias no código, comente ou crie uma issue no projeto com as devidas alterações deixando a explicação e a alteração a ser aplicada, e assim que possível será executado o commit para a branch main.
 
 ## Licença
 
