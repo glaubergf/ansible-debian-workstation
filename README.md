@@ -17,15 +17,15 @@ Veja o post desse projeto no **[SempreUpdate](https://sempreupdate.com.br/pos-in
 
 ## O Projeto
 
-Esse projeto foi desenvolvido para automatizar uma pós-instalaçãodo do **[Debian](https://www.debian.org/)** 10.9 (Stable Buster) em um Notebook Dell Inspiron N5010 core i5 de 1ª geração com 10 anos idade.
+Esse projeto foi desenvolvido para automatizar uma pós-instalação do **[Debian](https://www.debian.org/)** 10.9 (Stable Buster) em um Notebook Dell Inspiron N5010 core i5 de 1ª geração com 10 anos idade.
 
-Nesse projeto, foi adicionado para o repositório do Debian a seção contrib e não-free mais outros repositórios de terceiros para uso de aplicaçoes pertinente as necessidades do usuário e também as configurações no sistema para uso de VPN e mudanças no layout do Xfce4.
+Nesse projeto, foi adicionado para o repositório do Debian a seção contrib e non-free mais outros repositórios de terceiros para uso de aplicações pertinente as necessidades do usuário e também as configurações no sistema para uso de VPN e mudanças no layout do Xfce4.
 
-Altere as configiurações implantadas na playbook de acordo com as necessidades para o uso do sistema.
+Altere as configurações implantadas na playbook de acordo com as necessidades para o uso do sistema.
 
 ## A Automação
 
-Veja uma breve descrição da task dentro de cada role:
+Veja uma breve descrição das **tasks** dentro de cada **role**.
 
 Na role **add-repo** é executado a inclusão da seção _contrib_ e _non-free_ no repositórios do Debian. Adicionado também outros reporitórios de terceiros para uso de aplicações.
 
@@ -42,7 +42,7 @@ Adiconando URLs dos Repositorios Adicionais;
 Atualizando Repositorios.
 ```
 
-Na role **uninstall-app** é executado a remoção de algumas aplicações não necessária para para o uso e alterações de outras.
+Na role **uninstall-app** é executado a remoção de algumas aplicações não necessária para o uso e alterações de outras.
 
 * tasks:
 
@@ -73,7 +73,7 @@ Listando os Pacotes com DEBUG;
 Instalando Pacotes .deb do LibreOffice.
 ```
 
-Na role **create-user** é executado a criação do usuário para uso do sistema necessitando alterar a senha padrão no primeiro acesso.
+Na role **create-user** é executado a criação do(s) usuário(s) para uso do sistema necessitando alterar a senha padrão no primeiro acesso.
 
 * tasks:
 
@@ -82,20 +82,18 @@ Criando Conta de Usuario(s);
 Forca o Usuario a Alterar a Senha no Primeiro Login.
 ```
 
-Na role **aws-cli** é executado a instalação de pacotes necessários para acesso a AWS bem como exeção de comandos aws.
+Na role **aws-cli** é executado a instalação de pacotes necessários e configuração para acesso e manipulação na AWS.
 
 **Nota:**
-Para executar a role _'aws-cli'_, lembre-se de executar o ansible-vault pois há informações sensíveis nas variáveis assim deixando-as criptografadas.
+_Para executar a role **aws-cli**, lembre-se de executar o **ansible-vault** pois há informações sensíveis nas variáveis assim deixando-as criptografadas. As informações nas referidas variáveis nesse projeto são ficitícias, por esse motivo esta descriptografada._
 
-* Exemplos de comandos:
+* comandos:
 
 ```
 $ ansible-vault encrypt roles/var/main.yml
 $ ansible-vault decrypt role/aws-cli/var/main.yml
 $ ansible-playbook --ask-vault-pass -i hosts main.yml -t aws_cli
 ```
-
-Lembre-se que as informações nas referidas variáveis nesse projeto são ficitícias, por esse motivo esta descriptografada.
 
 * tasks:
 
@@ -109,7 +107,7 @@ Copiando a chave ssh de acesso na AWS;
 Configurando o .bashrc awsgo/alog (SSH) e data no historico.
 ```
 
-Na role **conf-all** é executado algumas configurações no sistema como alterara permissão de conexão com a VPN, backup e modificação do layout do xfce4 com uma template, cópia de diretório específico replicando no seu nome com a data, e ainda download de temas de ícones, fontes e imagens para área de trabalho descompactando-as e inserindo para ser identificadas no sistema.
+Na role **conf-all** é executado algumas configurações no sistema como alterar a permissão de conexão com a VPN, backup e modificação do layout do xfce4 com um template, cópia de diretório específico replicando no seu nome com data, e download de temas de ícones, fontes e imagens para área de trabalho, assim sendo identificado no sistema.
 
 * tasks:
 
@@ -129,7 +127,7 @@ Copiando diretorio BEMOBI;
 continuando ...
 ```
 
-Na role **rebbot-system** é executado o reboot no sistema.
+Na role **reboot-system** é executado o reboot no sistema.
 
 * tasks:
 
@@ -139,9 +137,9 @@ Reiniciando o sistema com todos os padrões.
 
 ## Contribuindo
 
-Esse projeto fica disponível para a comunidade utilizar de acordo com a necessidades para cada vertente.
+Esse projeto fica disponível para a comunidade utilizar de acordo com a necessidades de cada um.
 
-Para contribuições de melhorias no código, comente ou crie uma issue no projeto com as devidas alterações deixando a explicação e a alteração a ser aplicada, e assim que possível será executado o commit para a branch main.
+Para contribuições de melhorias no código, comente ou crie uma issue no projeto com as devidas alterações, deixando a explicação e a alteração a ser aplicada, assim que possível será executado o commit para a branch main.
 
 ## Licença
 
