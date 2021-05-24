@@ -17,11 +17,11 @@ Veja o post desse projeto no **[SempreUpdate](https://sempreupdate.com.br/pos-in
 
 ## O Projeto
 
-Esse projeto foi desenvolvido para automatizar uma pós-instalação do **[Debian](https://www.debian.org/)** 10.9 (Stable Buster) em um Notebook Dell Inspiron N5010 core i5 de 1ª geração com 10 anos idade.
+Esse projeto foi desenvolvido para automatizar uma pós-instalação do **[Debian](https://www.debian.org/)** 10.9 (Stable Buster) em um Notebook Dell Inspiron N5010 core i5 de 1ª geração (2010).
 
-Nesse projeto, foi adicionado para o repositório do Debian a seção contrib e non-free mais outros repositórios de terceiros para uso de aplicações pertinente as necessidades do usuário e também as configurações no sistema para uso de VPN e mudanças no layout do Xfce4.
+Nesse projeto, foi adicionado o repositório do Debian com a seção 'contrib' e 'non-free' mais outros repositórios de terceiros para uso de aplicações pertinente as necessidades do usuário, executado também as configurações de permissão de uso da VPN, acesso a cloud AWS e mudanças no layout do Xfce4.
 
-Altere as configurações implantadas na playbook de acordo com as necessidades para o uso do sistema.
+Altere as configurações desse projeto de acordo com as suas necessidades de uso.
 
 ## A Automação
 
