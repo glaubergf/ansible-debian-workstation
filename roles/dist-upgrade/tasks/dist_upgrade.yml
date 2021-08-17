@@ -1,0 +1,117 @@
+---
+- name: Parando a interface grafica (GUI)
+  shell: systemctl stop lightdm.service
+  tags: dist_upgrade
+
+- name: Editando repositorios do Debian 10 "buster" para o Debian 11 "bullseye"
+  replace:
+    path: "/etc/apt/sources.list"
+    backup: yes
+    regexp: "{{ item.From }}"
+    replace: "{{ item.To }}"
+  with_items:
+    - { From: 'buster', To: 'bullseye'}
+  tags: dist_upgrade
+
+- name: Editando formato do repositorio de segurança ([buster]bullseye/updates > bullseye-security)
+  replace:
+    path: "/etc/apt/sources.list"
+    backup: yes
+    regexp: "bullseye/updates"
+    replace: "bullseye-security"
+  tags: dist_upgrade
+
+- name: Encontrando repositorios de terceiros
+  find:
+    paths: "/etc/apt/sources.list.d/"
+    patterns: "*.list"    
+  register: result_list
+  tags: dist_upgrade
+
+- name: Debugando repositorios de terceiros
+  debug:
+    msg: "{{ result_list }}"
+  tags: dist_upgrade
+
+- name: Comentando repositorios de terceiros em '/etc/apt/sources.list.d/*.list'
+  replace:
+    path: "{{ item.path }}"
+    regexp: "deb "
+    replace: "#deb "
+  with_items: "{{ result_list.files }}"
+  tags: dist_upgrade
+
+- name: Atualizando cache do repositorio 'apt-get update'
+  apt:
+    update_cache: yes
+    force_apt_get: yes
+  tags: dist_upgrade
+
+- name: Atualizando a versao do 'openssh-server' (bullseye) para executar o upgrade do sistema via 'ssh'
+  apt:
+    name: openssh-server
+    state: latest
+  tags: dist_upgrade
+
+- name: Reiniciando o servico 'sshd'
+  # Nota de lançamento Debian 11 (bullseye):
+  # openssh-server: não consegue reiniciar sshd restart após atualização para a 'versão 8.1p1-2'
+  # https://bugs.debian.org/948318
+  service:
+    name: sshd
+    state: restarted
+  tags: dist_upgrade
+
+- name: Atualizando todos os pacotes 'apt-get dist-upgrade'
+  apt:
+    upgrade: dist
+    force_apt_get: yes
+    state: latest
+  tags: dist_upgrade
+
+- name: Verificando se e necessario uma reinicializacao do sistema
+  register: reboot_required_file 
+  stat:
+    path: /var/run/reboot-required
+    get_md5: no
+  tags: dist_upgrade
+
+- name: Reiniciando o sistema devido a atualizacao do kernel
+  reboot: 
+    connect_timeout: 5 
+    reboot_timeout: 300 
+    pre_reboot_delay: 0 
+    post_reboot_delay: 30 
+    test_command: uptime 
+  when: reboot_required_file.stat.exists
+  tags: dist_upgrade
+
+- name: Atualizando novamente o cache do repositorio 'apt-get update'
+  apt:
+    update_cache: yes
+    force_apt_get: yes
+  tags: dist_upgrade
+
+- name: Atualizando novamente todos os pacotes 'apt-get dist-upgrade'
+  # Nota de lançamento Debian 11 (bullseye):
+  # As atualizações que envolvam libgc1c2 necessitam de duas execuções.
+  # https://bugs.debian.org/988963
+  apt:
+    upgrade: dist
+    force_apt_get: yes
+    state: latest
+  tags: dist_upgrade
+
+- name: Reiniciando o sistema 'Pos-Upgrade'
+  reboot:
+  tags: dist_upgrade
+
+- name: Removendo pacotes inuteis do cache do 'apt'
+  apt:
+    autoclean: yes
+  tags: dist_upgrade
+
+- name: Removendo dependencias de pacotes que nao sao mais necessarias
+  apt:
+    autoremove: yes
+  tags: dist_upgrade
