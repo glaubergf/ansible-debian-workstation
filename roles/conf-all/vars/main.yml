@@ -36,3 +36,9 @@ pictures_rul:
 copy_B:
   - mv /tmp/BEMOBI /tmp/BEMOBI_$(date +'%Y-%m-%d')
   - mv /tmp/BEMOBI* /home/glauber.fonseca/
+
+conf_lightdm_gtk:
+  - lightdm-gtk-greeter/lightdm-gtk-greeter.conf
+  - lightdm-gtk-greeter/Gas-Soldier-with-Weapon-64x64.png
+  - lightdm-gtk-greeter/TheMandalorian_BabyYoda_StarWars.jpeg
+  
