@@ -1,25 +1,31 @@
 ---
 Projeto: ansible-debian-workstation
 Descrição: O objetivo desse projeto é automatizar a configuração na pós-instalação do sistema 
-           GNU/Linux Debian (debian-10.9.0-amd64-xfce-CD-1.iso), assim nos poupando tempo e de
-           todo trabalho braçal.
-Autor: Glauber GF (mcnd2)
-Atualização: 2021-05-23
+           GNU/Linux Debian, bem como algumas configurações adicionais e também upgrade de versão do
+           sistema, assim nos poupando tempo e de todo trabalho braçal.
+Autor: Glauber GF (@mcnd2)
+Atualização: 2021-08-16
 ---
 
 ![Image](https://github.com/glaubergf/ansible-debian-workstation/blob/main/pictures/rio-de-janeiro-swirl-debian.jpg) 
 
 # Pós-instalação do Debian com Ansible
 
-O objetivo desse projeto é executar após uma instalação do Debian com Ansible instalando pacotes, removendo outros, adicionando repositórios, criando usuário etc, assim nos poupando tempo e de todo trabalho braçal.
+O objetivo desse projeto é executar com o Ansible configurações pós-instalação do Debian, instalando pacotes, removendo outros, adicionando repositórios, criando usuário etc. Também podemos executar o upgrade de versão do sistema, no caso da versão stable buster para bullseye, assim nos poupando tempo e de todo trabalho braçal.
 
-Veja o post desse projeto no **[SempreUpdate](https://sempreupdate.com.br/pos-instalacao-do-debian-com-ansible/)**.
+Veja os posts desse projeto no **SempreUpdate**:
+
+**[Pós-instalação do Debian com Ansible](https://sempreupdate.com.br/pos-instalacao-do-debian-com-ansible/)**
+
+**[Upgrade do Debian 10 para Debian 11 com Ansible](https://sempreupdate.com.br/upgrade-do-debian-10-para-Debian-11-com-ansible/)**
 
 ## O Projeto
 
-Esse projeto foi desenvolvido para automatizar uma pós-instalação do **[Debian](https://www.debian.org/)** 10.9 (Stable Buster) em um Notebook Dell Inspiron N5010 core i5 de 1ª geração (2010).
+Esse projeto inicial foi desenvolvido para automatizar uma pós-instalação do **[Debian](https://www.debian.org/)** 10.9 (Stable Buster) em um Notebook Dell Inspiron N5010 core i5 de 1ª geração (2010).
 
 Nesse projeto, foi adicionado o repositório do Debian com a seção 'contrib' e 'non-free' mais outros repositórios de terceiros para uso de aplicações pertinente as necessidades do usuário, executado também as configurações de permissão de uso da VPN, acesso a cloud AWS e mudanças no layout do Xfce4.
+
+Na última atualização, foi adiconado role para atualização de todos os pacotes do sistema e também outra role para executar o upgrade de versão do sistema.
 
 Altere as configurações desse projeto de acordo com as suas necessidades de uso.
 
@@ -133,6 +139,51 @@ Na role **reboot-system** é executado o reboot no sistema.
 
 ```
 Reiniciando o sistema com todos os padrões.
+```
+
+Na role **update-upgrade-app** é executado a atualização de todo os pacotes do sistema com a versão mais atual do repositório.
+
+* tasks:
+
+```
+Atualizando cache do repositorio 'apt-get';
+Atualizando todos os pacotes 'apt-get';
+Verificando se uma reinicializacao e necessaria para o sistema;
+Reinicializando o host Debian.
+```
+
+Na role **dist-upgrade** é executado o stop da interface gráfica, a alteração do repositórios da versão buster para bullseye, comentado todos os repositorios de terceiros, a atualização de todo o cache do repositórios bullseye, atualização do pacote openssh-server para versão do bullseye para dar continuidade no upgrade do sistema, o restart do serviço sshd, atualização de todos os pacotes para a versão do bullseye, reboot do sistema, limpeza de cache e autoremove de pacotes não mais necessários.
+
+**Nota:**
+_Para executar a role **dist-upgrade**, lembre-se de executar a playbook com o parâmetro **-t** [tag] setando apenas a referida role a ser executada. Para checar a execução antes de aplicá-la, use no final do comando o parâmetro **-C** ["c" maiúsculo] conforme demostrado abaixo._
+
+* comandos:
+
+```
+$ ansible-playbook -i hosts main.yml -t dist-upgrade
+$ ansible-playbook -i hosts main.yml -t dist-upgrade -C
+```
+
+* tasks:
+
+```
+Parando a interface grafica (GUI);
+Editando repositorios do Debian 10 "buster" para o Debian 11 "bullseye";
+Editando formato do repositorio de segurança ([buster]bullseye/updates > bullseye-security);
+Encontrando repositorios de terceiros;
+Debugando repositorios de terceiros;
+Comentando repositorios de terceiros em '/etc/apt/sources.list.d/*.list';
+Atualizando cache do repositorio 'apt-get update';
+Atualizando a versao do 'openssh-server' (bullseye) para executar o upgrade do sistema via 'ssh';
+Reiniciando o servico 'sshd';
+Atualizando todos os pacotes 'apt-get dist-upgrade';
+Verificando se e necessario uma reinicializacao do sistema;
+Reiniciando o sistema devido a atualizacao do kernel;
+Atualizando novamente o cache do repositorio 'apt-get update';
+Atualizando novamente todos os pacotes 'apt-get dist-upgrade';
+Reiniciando o sistema 'Pos-Upgrade';
+Removendo pacotes inuteis do cache do 'apt';
+Removendo dependencias de pacotes que nao sao mais necessarias.
 ```
 
 ## Contribuindo
