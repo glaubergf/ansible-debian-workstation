@@ -28,13 +28,16 @@ apps:
   - chromium
   - chromium-l10n
   - evince
+  - pdfarranger # Editar PDFs
+  - xournal # "rabiscar" apresentação em slides
+  - tldr
   - cmatrix
   - clamtk
   - plank
   - xscreensaver
   - xscreensaver-gl
   - xscreensaver-gl-extra
-  - redshift
+  - redshift-gtk
   - p7zip-full
   - p7zip-rar
   - unrar
