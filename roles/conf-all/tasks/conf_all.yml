@@ -13,13 +13,28 @@
   tags: conf_all
 
 - name: Copiando template do Painel do xfce4
-# Reiniciar o sistema para surtir efeito.
+#reiniciar o sistema para aplicar.
   copy:
     src: xfce4/
     dest: /home/glauber.fonseca/.config/xfce4
     owner: glauber.fonseca
     group: glauber.fonseca
     mode: '0766'
+  tags: conf_all
+
+- name: Backup do 'lightdm-gtk-greeter.conf' do sistema
+  shell: mv /etc/lightdm/lightdm-gtk-greeter.conf /etc/lightdm/lightdm-gtk-greeter.conf.ORG
+  tags: conf_all
+
+- name: Copiando template do utilitario de configuracao de login LightDM GTK+ Greeter
+#reiniciar o sistema para aplicar.
+  copy:
+    src: "{{ item }}"
+    dest: /etc/lightdm/
+    owner: root
+    group: root
+    mode: '0644'
+  loop: "{{ conf_lightdm_gtk }}"
   tags: conf_all
 
 - name: Download dos pacotes de temas de icones Ardis e Nitrux
