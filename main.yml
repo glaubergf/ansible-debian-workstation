@@ -10,3 +10,5 @@
   - { role: aws-cli, tags: aws_cli }
   - { role: conf-all, tags: conf_all }
   - { role: reboot-system, tags: reboot_system }
+  - { role: update-upgrade-app, tags: update_upgrade_app }
+  - { role: dist-upgrade, tags: dist_upgrade }
