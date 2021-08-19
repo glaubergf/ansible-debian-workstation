@@ -115,3 +115,28 @@
   apt:
     autoremove: yes
   tags: dist_upgrade
+
+- name: Lendo novamente os repositorios de terceiros
+  find:
+    paths: "/etc/apt/sources.list.d/"
+    patterns: "*.list"    
+  register: result_list1
+  tags: dist_upgrade1
+
+- name: Descomentando repositorios de terceiros em '/etc/apt/sources.list.d/*.list'
+  replace:
+    path: "{{ item.path }}"
+    regexp: '#deb '
+    replace: 'deb '
+  with_items:
+    - "{{result_list1.files }}"
+  tags: dist_upgrade1
+
+- name: Editando repositorios de Terceiros de 'buster' para 'bullseye'
+  replace:
+    path: "{{ item.path }}"
+    regexp: 'buster'
+    replace: 'bullseye'
+  with_items:
+    - "{{ result_list1.files }}"
+  tags: dist_upgrade1
