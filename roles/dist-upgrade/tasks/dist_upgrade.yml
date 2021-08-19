@@ -121,7 +121,7 @@
     paths: "/etc/apt/sources.list.d/"
     patterns: "*.list"    
   register: result_list1
-  tags: dist_upgrade1
+  tags: dist_upgrade
 
 - name: Descomentando repositorios de terceiros em '/etc/apt/sources.list.d/*.list'
   replace:
@@ -130,7 +130,7 @@
     replace: 'deb '
   with_items:
     - "{{result_list1.files }}"
-  tags: dist_upgrade1
+  tags: dist_upgrade
 
 - name: Editando repositorios de Terceiros de 'buster' para 'bullseye'
   replace:
@@ -139,4 +139,4 @@
     replace: 'bullseye'
   with_items:
     - "{{ result_list1.files }}"
-  tags: dist_upgrade1
+  tags: dist_upgrade
