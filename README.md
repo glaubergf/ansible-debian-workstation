@@ -2,18 +2,20 @@
 Projeto: ansible-debian-workstation
 Descrição: O objetivo desse projeto é automatizar a configuração na pós-instalação do sistema 
            GNU/Linux Debian, bem como algumas configurações adicionais e também upgrade de versão do
-           sistema, assim nos poupando tempo e de todo trabalho braçal.
+           sistema, assim nos poupando tempo, esforço e trabalho braçal.
 Autor: Glauber GF (@mcnd2)
-Atualização: 2021-08-16
+Atualização: 2021-08-19
 ---
 
 ![Image](https://github.com/glaubergf/ansible-debian-workstation/blob/main/pictures/rio-de-janeiro-swirl-debian.jpg) 
 
-# Pós-instalação do Debian com Ansible
+# Configurando o Debian com Ansible
 
-O objetivo desse projeto é executar com o Ansible configurações pós-instalação do Debian, instalando pacotes, removendo outros, adicionando repositórios, criando usuário etc. Também podemos executar o upgrade de versão do sistema, no caso da versão stable buster para bullseye, assim nos poupando tempo e de todo trabalho braçal.
+O objetivo desse projeto é executar com o Ansible a configurações pós-instalação do Debian, instalando pacotes, removendo outros, adicionando repositórios, criando usuário etc.
 
-Veja os posts desse projeto no **SempreUpdate**:
+Também podemos executar o update de todos os pacotes do sistema bem como upgrade de versão do sistema, no caso da versão stable "buster" para "bullseye", assim nos poupando tempo, esforço e trabalho braçal.
+
+Veja os posts citando esse projeto no **SempreUpdate**:
 
 **[Pós-instalação do Debian com Ansible](https://sempreupdate.com.br/pos-instalacao-do-debian-com-ansible/)**
 
@@ -21,13 +23,13 @@ Veja os posts desse projeto no **SempreUpdate**:
 
 ## O Projeto
 
-Esse projeto inicial foi desenvolvido para automatizar uma pós-instalação do **[Debian](https://www.debian.org/)** 10.9 (Stable Buster) em um Notebook Dell Inspiron N5010 core i5 de 1ª geração (2010).
+O projeto inicial foi desenvolvido para automatizar uma pós-instalação do **[Debian](https://www.debian.org/)** 10.9 (Stable Buster) em um Notebook Dell Inspiron N5010 core i5 de 1ª geração (2010).
 
 Nesse projeto, foi adicionado o repositório do Debian com a seção 'contrib' e 'non-free' mais outros repositórios de terceiros para uso de aplicações pertinente as necessidades do usuário, executado também as configurações de permissão de uso da VPN, acesso a cloud AWS e mudanças no layout do Xfce4.
 
-Na última atualização, foi adiconado role para atualização de todos os pacotes do sistema e também outra role para executar o upgrade de versão do sistema.
+Nas últimas atualizações, foi adiconado a role para atualização de todos os pacotes do sistema e também outra role para executar o upgrade de versão do sistema com o lançamento da versão "Bullseye".
 
-Altere as configurações desse projeto de acordo com as suas necessidades de uso.
+Para usar esse projeto, altere as configurações de acordo com seu cenário e necessidade de uso.
 
 ## A Automação
 
@@ -152,10 +154,10 @@ Verificando se uma reinicializacao e necessaria para o sistema;
 Reinicializando o host Debian.
 ```
 
-Na role **dist-upgrade** é executado o stop da interface gráfica, a alteração do repositórios da versão buster para bullseye, comentado todos os repositorios de terceiros, a atualização de todo o cache do repositórios bullseye, atualização do pacote openssh-server para versão do bullseye para dar continuidade no upgrade do sistema, o restart do serviço sshd, atualização de todos os pacotes para a versão do bullseye, reboot do sistema, limpeza de cache e autoremove de pacotes não mais necessários.
+Na role **dist-upgrade** é executado a parada a interface gráfica, a alteração do repositórios do Debian da versão Buster para Bullseye, comentado todos os repositorios de terceiros, a atualização de todo o cache do repositórios Bullseye, a atualização do pacote openssh-server para versão do Bullseye para dar continuidade no upgrade do sistema, o restart do serviço sshd, a atualização de todos os pacotes para a versão do bullseye, o reboot do sistema, a limpeza de cache, o autoremove de pacotes não mais necessários, descomentado os repositórios de terceiros e editado a versão do repositório de terceiro do Buster para Bullseye.
 
 **Nota:**
-_Para executar a role **dist-upgrade**, lembre-se de executar a playbook com o parâmetro **-t** [tag] setando apenas a referida role a ser executada. Para checar a execução antes de aplicá-la, use no final do comando o parâmetro **-C** ["c" maiúsculo] conforme demostrado abaixo._
+_Para executar a role **dist-upgrade**, lembre-se de executar a playbook com o parâmetro **-t** [tag] setando apenas a referida role a ser executada. Para checar a execução antes de aplicá-la, use no final do comando o parâmetro **-C** ["c" maiúsculo] conforme demostrado abaixo.
 
 * comandos:
 
@@ -183,12 +185,15 @@ Atualizando novamente o cache do repositorio 'apt-get update';
 Atualizando novamente todos os pacotes 'apt-get dist-upgrade';
 Reiniciando o sistema 'Pos-Upgrade';
 Removendo pacotes inuteis do cache do 'apt';
-Removendo dependencias de pacotes que nao sao mais necessarias.
+Removendo dependencias de pacotes que nao sao mais necessarias;
+Lendo novamente os repositorios de terceiros;
+Descomentando repositorios de terceiros em '/etc/apt/sources.list.d/*.list;
+Editando repositorios de Terceiros de 'buster' para 'bullseye'.
 ```
 
 ## Contribuindo
 
-Esse projeto fica disponível para a comunidade utilizar de acordo com a necessidades de cada um.
+Esse projeto fica disponível para a comunidade. Use e façam modificações de acordo com o cenário e necessidade de cada um.
 
 Para contribuições de melhorias no código, comente ou crie uma issue no projeto com as devidas alterações, deixando a explicação e a alteração a ser aplicada, assim que possível será executado o commit para a branch main.
 
@@ -200,7 +205,7 @@ Para contribuições de melhorias no código, comente ou crie uma issue no proje
 
 ------
 
-Copyright (c) 2021 Glauber GF (mcnd2)
+Copyright (c) 2021 Glauber GF (@mcnd2)
 
 Este programa é um software livre: você pode redistribuí-lo e/ou modificar
 sob os termos da GNU General Public License conforme publicada por
