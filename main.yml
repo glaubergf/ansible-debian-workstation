@@ -1,7 +1,0 @@
----
-- hosts: local
-  become: yes
-  roles:
-  - { role: add-repo, tags: add_repo }
-  - { role: install-app, tags: install_app }
-  - { role: aws-cli, tags: aws_cli }
