@@ -1,0 +1,17 @@
+---
+# vars file for roles/install-loffice
+
+libreoffice_url:
+  - https://download.documentfoundation.org/libreoffice/stable/7.1.6/deb/x86_64/LibreOffice_7.1.6_Linux_x86-64_deb.tar.gz
+  - https://download.documentfoundation.org/libreoffice/stable/7.1.6/deb/x86_64/LibreOffice_7.1.6_Linux_x86-64_deb_langpack_pt-BR.tar.gz
+  - https://download.documentfoundation.org/libreoffice/stable/7.1.6/deb/x86_64/LibreOffice_7.1.6_Linux_x86-64_deb_helppack_pt-BR.tar.gz
+
+lo_extract_gz:
+  - /tmp/LibreOffice_7.1.6_Linux_x86-64_deb.tar.gz
+  - /tmp/LibreOffice_7.1.6_Linux_x86-64_deb_langpack_pt-BR.tar.gz
+  - /tmp/LibreOffice_7.1.6_Linux_x86-64_deb_helppack_pt-BR.tar.gz
+
+create_list_deb_lo:
+  - ls -d /tmp/LibreOffice_7.1.6.2_Linux_x86-64_deb/DEBS/* > /tmp/loffice-main-deb.txt
+  - ls -d /tmp/LibreOffice_7.1.6.2_Linux_x86-64_deb_langpack_pt-BR/DEBS/* >> /tmp/loffice-main-deb.txt
+  - ls -d /tmp/LibreOffice_7.1.6.2_Linux_x86-64_deb_helppack_pt-BR/DEBS/* >> /tmp/loffice-main-deb.txt

@@ -1,0 +1,123 @@
+---
+- name: Adicionando permissão para o usuario conectar a VPN com o OpenFortiGUI
+  copy:
+    src: openfortigui
+    dest: /etc/sudoers.d/openfortigui
+    owner: root
+    group: root
+    mode: '0440'
+  tags: conf_all
+
+- name: Backup do .config/xfce4 do usuário
+  shell: mv /home/debian/.config/xfce4 /home/debian/.config/xfce4-ORIG
+  tags: conf_all
+
+- name: Copiando template do Painel do xfce4
+#reiniciar o sistema para aplicar.
+  copy:
+    src: xfce4/
+    dest: /home/debian/.config/xfce4
+    owner: debian
+    group: debian
+    mode: '0766'
+  tags: conf_all
+
+- name: Backup do 'lightdm-gtk-greeter.conf' do sistema
+  shell: mv /etc/lightdm/lightdm-gtk-greeter.conf /etc/lightdm/lightdm-gtk-greeter.conf.ORG
+  tags: conf_all
+
+- name: Copiando template do utilitario de configuracao de login LightDM GTK+ Greeter
+#reiniciar o sistema para aplicar.
+  copy:
+    src: "{{ item }}"
+    dest: /etc/lightdm/
+    owner: root
+    group: root
+    mode: '0644'
+  loop: "{{ conf_lightdm_gtk }}"
+  tags: conf_all
+
+- name: Download dos pacotes de temas de icones Ardis e Nitrux
+  get_url:
+    url: "{{ item }}"
+    dest: "/tmp"
+    mode: "0755"
+  with_items: "{{ icons_url }}"
+  tags: conf_all
+
+- name: Descompactando os pacotes de temas de icones Ardis e Nitrux
+  unarchive:
+    src: "{{ item }}"
+    dest: "/tmp"
+    mode: "0755"
+    remote_src: yes
+  with_items: "{{ icons_extract_zip }}"
+  tags: conf_all
+
+- name: Copiando os diretorios de temas de icones para o /usr/share/icons
+  shell: "{{ item }}"
+  loop: "{{ dir_temas }}"
+  tags: conf_all
+
+- name: Download do pacote de fontes Ubuntu
+  get_url:
+    url: "{{ item }}"
+    dest: "/tmp"
+    mode: '0755'
+  loop: "{{ font_ubuntu }}"
+  tags: conf_all
+
+- name: Descompactando o pacote de fontes Ubuntu
+  unarchive:
+    src: "{{ item }}"
+    dest: "/tmp"
+    mode: "0755"
+    remote_src: yes
+  with_items: "{{ fonts_extract_zip }}"
+  tags: conf_all
+
+- name: Copiando os diretorios de fontes Ubuntu para o /usr/share/fonts
+  shell: "{{ item }}"
+  loop: "{{ dir_fontes }}"
+  tags: conf_all
+
+- name: Criando diretorio ~/Imagens/wallpaper se não existir
+  file:
+    path: "/home/debian/Imagens/wallpaper"
+    state: directory
+    mode: '0755'
+  tags: conf_all
+
+- name: Download papel de parede Pexels
+  get_url:
+    url: "{{ item }}"
+    dest: "/home/debian/Imagens/wallpaper"
+    owner: debian
+    group: debian
+    mode: '0755'
+  loop: "{{ pictures_rul }}"
+  tags: conf_all
+
+- name: Copiando diretorio BEMOBI
+  copy:
+    src: /media/backup/BEMOBI
+    dest: /tmp
+    owner: debian
+    group: debian
+    mode: '0755'
+  tags: conf_all
+
+- name: continuando ... 
+  shell: "{{ item }}"
+  loop: "{{ copy_B }}"
+  tags: conf_all
+
+- name: Reinicializando o Sistema
+  reboot: 
+    msg: "Reinicialização iniciada pelo Ansible devido a mudança de arquivos de configuracoes do xfce4-panel e lightdm" 
+    connect_timeout: 5 
+    reboot_timeout: 300 
+    pre_reboot_delay: 0 
+    post_reboot_delay: 30 
+    test_command: uptime 
+  tags: conf_all

@@ -1,0 +1,19 @@
+---
+# vars file for roles/create-user
+
+new_user:
+  - glauber.fonseca
+#  - gabriel
+#  - larissa
+
+comment_user:
+  - Glauber G Fonseca
+#  - Gabriel BF
+#  - Larissa BF
+
+#password:
+#  - zaq1
+#  - zaq1
+
+#password_user:
+#  - passwd_user.yml 

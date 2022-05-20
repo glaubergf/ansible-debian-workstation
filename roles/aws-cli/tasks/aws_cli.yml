@@ -1,0 +1,61 @@
+---
+# Nota: Para executar a role 'aws-cli', lembre-se de executar com o vault
+# pois há informações sensíveis no 'var/main.yml' onde está criptografada 
+# com o 'ansible-vault encrypt'. Use o decrypt para descriptografar.
+# Exemplo:
+# -> ansible-playbook --ask-vault-pass -i hosts main.yml -t aws_cli
+# -> ansible-vault decrypt role/aws-cli/var/main.yml
+
+- name: Instalando o Python3 PIP
+  apt:
+    pkg: python3-pip
+    state: latest
+  tags: aws_cli
+
+- name: Instalando o boto via PIP
+  pip:
+    name: boto
+    state: latest
+  tags: aws_cli
+
+- name: Instalando a AWS CLI
+  pip:
+    name: awscli
+    state: latest
+  tags: aws_cli
+
+- name: Executando AWS Configure inserindo Id, Key, Region e formato no profile Default
+  shell: aws configure set {{ item.key }} {{ item.value }} --profile {{ aws_profile }}
+  no_log: True
+  with_dict:
+    aws_access_key_id: "{{ access_key_id }}"
+    aws_secret_access_key: "{{ secret_access_key }}"
+    region: "{{ aws_region }}"
+    format: "{{ aws_format }}"
+  become_user: "{{ aws_system_user }}"
+  tags: aws_cli
+
+- name: Criando o diretório ~/.ssh caso nao exista
+  file:
+    path: /home/debian/.ssh
+    state: directory
+    owner: debian
+    group: debian
+    mode: '0700'
+  tags: aws_cli
+
+- name: Copiando a chave ssh de acesso na AWS
+  copy:
+    #'src' -> desktop Debian.
+    src: /home/mcnd2/.ssh/id_rsa_opsworks_glauberfonseca
+    dest: /home/debian/.ssh/id_rsa_opsworks_glauberfonseca
+    owner: debian
+    group: debian
+    mode: '0600'
+  tags: aws_cli
+
+- name: Configurando o .bashrc awsgo/alog (SSH) e data no historico
+  shell: "{{ item }}"
+  no_log: True
+  loop: "{{ bashrc }}"
+  tags: aws_cli

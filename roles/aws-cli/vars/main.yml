@@ -1,0 +1,22 @@
+---
+# vars file for roles/aws-cli
+
+# AWS Configure
+aws_system_user: glauber.fonseca
+aws_profile: default
+access_key_id: xxxxxxxxxxxxxxxxxxxx
+secret_access_key: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+aws_region: us-east-1
+aws_format: json
+
+# Adicionar linhas de configuração no .bashrc
+bashrc:
+  - echo '' >> /home/debian/.bashrc
+  - echo '# AWSGO, ALOG e HISTORY_TIME' >> /home/debian/.bashrc
+  - echo 'awsgo() { /usr/bin/ssh -i /home/debian/.ssh/id_rsa_opsworks_glauberfonseca glauberfonseca@"$@";}' >> /home/debian/.bashrc
+  - echo 'alog() { /usr/bin/ssh glauber.fonseca@10.5.9."$@";}' >> /home/debian/.bashrc
+  - echo 'HISTTIMEFORMAT="%d/%m/%y %T "' >> /home/debian/.bashrc
+
+# ssh-copy-id
+sshcopyid:
+  - ssh-copy-id -i /home/mcnd2/.ssh/debiandesk_id_rsa debian@192.168.0.103

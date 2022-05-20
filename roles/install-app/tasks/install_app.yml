@@ -1,0 +1,22 @@
+---
+- name: Instalando Pacotes do Repositorio
+  apt:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ apps }}"
+  tags: install_app
+
+- name: Instalando Pacotes Flatpak
+  flatpak:
+    name: "{{ item }}"
+    state: present
+    method: system
+  with_items: "{{ flatpak_apps }}"
+  tags: install_app
+
+- name: Instalando Pacotes ".deb" da Internet
+  apt:
+    deb: "{{ item }}"
+  loop: "{{ deb_apps }}"
+  tags: install_app1
+  

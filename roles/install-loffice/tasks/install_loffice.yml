@@ -1,0 +1,49 @@
+---
+## Remover o pacote LibreOffice existente
+#- name: Removendo pacotes Libreoffice existente
+#  apt:
+#    name: libreoffice*
+#    state: absent
+#    purge: yes
+#    autoclean: yes
+#    autoremove: yes
+#  tags: remove_loffice
+
+- name: Download do LibreOffice
+  get_url:
+    url: "{{ item }}"
+    dest: "/tmp"
+    mode: "0755"
+  with_items: "{{ libreoffice_url }}"
+  tags: install_loffice
+
+- name: Descompactando Pacotes do LibreOffice
+  unarchive:
+    src: "{{ item }}"
+    dest: "/tmp"
+    mode: "0755"
+    remote_src: yes
+  with_items: "{{ lo_extract_gz }}"
+  tags: install_loffice
+
+- name: Criando uma Lista de Pacotes .deb do LibreOffice
+  shell: "{{ item }}"
+  with_items: "{{ create_list_deb_lo }}"
+  tags: install_loffice
+
+- name : Criando Variavel da Lista dos Pacotes do LibreOffice 
+  shell: cat /tmp/loffice-main-deb.txt
+  register: list_deb_lo
+  tags: install_loffice
+
+- name: Listando os Pacotes com DEBUG
+  debug:
+    msg: "{{ list_deb_lo }}"
+  tags: install_loffice
+
+- name: Instalando Pacotes .deb do LibreOffice
+  apt:
+    deb: "{{ item }}"
+    force: yes
+  with_items: "{{ list_deb_lo.stdout_lines }}"
+  tags: install_loffice

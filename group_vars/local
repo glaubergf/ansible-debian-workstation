@@ -1,0 +1,5 @@
+# vars file for hosts (inventory)
+---
+ansible_user: user-do-alvo
+ansible_password: senha-do-user-alvo
+ansible_become_password: senha-do-user-alvo

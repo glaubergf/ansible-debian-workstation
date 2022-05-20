@@ -1,0 +1,87 @@
+---
+# vars file for install-app
+
+apps:
+  - terminator
+  - htop
+  - hardinfo
+  - lshw-gtk
+  - gsmartcontrol
+  - gparted
+  - gnome-system-tools
+  - gnome-system-monitor
+  - psensor
+  - ntp
+  - vlc
+  - audacious
+  - filezilla
+  - remmina
+  - transmission
+  - gimp
+  - flameshot
+  - simple-scan
+  - thunderbird
+  - thunderbird-l10n-pt-br
+  - lightdm-gtk-greeter-settings
+  - hplip
+  - hplip-gui
+  - chromium
+  - chromium-l10n
+  - evince
+  - pdfarranger # Editar PDFs
+  - xournal # "rabiscar" apresentação em slides
+  - tldr
+  - cmatrix
+  - clamtk
+  - plank
+  - xscreensaver
+  - xscreensaver-gl
+  - xscreensaver-gl-extra
+  - redshift-gtk
+  - p7zip-full
+  - p7zip-rar
+  - unrar
+  - unrar-free
+  - unzip
+  - build-essential
+  - curl
+  - deborphan
+  - menulibre
+#  - mugshot
+  - debconf-utils
+  - apt-transport-https
+  - google-chrome-stable
+  - code
+  - anydesk
+  - atom
+  - spotify-client
+  - openfortigui
+  - docker-ce
+  - docker-ce-cli
+  - containerd.io
+  - ansible
+  - python3-pip
+  - default-jre
+  - default-jre-headless
+  - openjdk-11-jre
+  - openjdk-11-jre-headless
+  - makepasswd
+  - whois #contem o mkpassd
+  - tldr
+  - neofetch
+  - ethstatus
+  - s-tui
+  - teamviewer
+  - megasync
+  - teams
+
+flatpak_apps:
+  - com.getpostman.Postman
+  - com.jgraph.drawio.desktop
+
+deb_apps:
+  - https://github.com/meetfranz/franz/releases/download/v5.8.0/franz_5.8.0_amd64.deb #Franz
+  # Note: para instalar Franz no Debian 11, deverá instalar o pacote de dependência
+  # 'libappindicator3-1' da versão unstable.
+  #- https://download.teamviewer.com/download/linux/teamviewer_amd64.deb #TeamViewer
+  #- https://mega.nz/linux/MEGAsync/Debian_10.0/amd64/megasync_4.4.0-1.1_amd64.deb #MEGASync
