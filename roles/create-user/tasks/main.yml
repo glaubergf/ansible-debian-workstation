@@ -1,3 +1,0 @@
----
-# tasks file for roles/create-user
-- include: create_user.yml

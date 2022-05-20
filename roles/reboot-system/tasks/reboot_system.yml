@@ -1,5 +1,0 @@
----
-- name: Reiniciando o sistema com todos os padrões
-  reboot:
-    msg: "Reinicialização iniciada pelo Ansible"
-  tags: reboot_system

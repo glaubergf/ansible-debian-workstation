@@ -1,16 +1,15 @@
 ---
 # vars file for add-repo
+
 apt_key_urls:
   - https://dl.google.com/linux/linux_signing_key.pub #GoogleChrome
   - https://packages.microsoft.com/keys/microsoft.asc #VSCode
   - https://keys.anydesk.com/repos/DEB-GPG-KEY #AnyDesk
   - https://packagecloud.io/AtomEditor/atom/gpgkey #Atom
-  - https://download.spotify.com/debian/pubkey_0D811D58.gpg #Spotify
-  - https://download.docker.com/linux/debian/gpg #Docker
+  - https://repositories.mwbsys.com/dpkg/keyring.gpg #Malwarebytes
 
-id_gpg:
-  - 2FAB19E7CCB7F415 #OpenFortiGUI
-  - 93C4A3FD7BB9C367 #Ansible
+#id_gpg:
+#  - 2FAB19E7CCB7F415 #OpenFortiGUI exemplo
 
 apt_repo_urls:
   - url: deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main #GoogleChrome
@@ -21,11 +20,12 @@ apt_repo_urls:
     filename: anydesk
   - url: deb [arch=amd64] https://packagecloud.io/AtomEditor/atom/any/ any main #Atom
     filename: atom
-  - url: deb http://repository.spotify.com stable non-free #Spotify
-    filename: spotify
-  - url: deb https://apt.iteas.at/iteas buster main #OpenFortiGUI
-    filename: openfortigui
-  - url: deb [arch=amd64] https://download.docker.com/linux/debian buster stable #Docker
-    filename: docker
-  - url: deb http://ppa.launchpad.net/ansible/ansible/ubuntu trusty main #Ansible
-    filename: ansible
+  - url: deb [arch=amd64] https://repositories.mwbsys.com/dpkg xenial non-free #Malwarebytes
+    filename: malwarebytes
+
+flatpakrepo_url:
+  - url: https://dl.flathub.org/repo/flathub.flatpakrepo #Flathub
+
+token_mblinux:
+  #- sudo ACCOUNTTOKEN=xxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+  - xxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx

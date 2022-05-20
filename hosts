@@ -1,9 +1,8 @@
 [local]
 #localhost ansible_connection=local
-#dell-inspiron-n5010 ansible_host=192.168.0.104
-debian-stable ansible_host=192.168.122.128
+lmde5 ansible_host=192.168.122.28
 
 [local:vars]
-ansible_user=mcnd2
-ansible_password=xxxxxxxxx
-ansible_become_password=xxxxxxxxx
+ansible_user = "{{ ansible_user }}"
+ansible_password = "{{ ansible_password }}"
+ansible_become_password = "{{ ansible_become_password }}"

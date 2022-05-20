@@ -1,3 +1,0 @@
----
-# tasks file for uninstall-app
-- include: uninstall_app.yml

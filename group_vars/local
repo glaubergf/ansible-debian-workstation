@@ -1,0 +1,6 @@
+# vars file for hosts (inventory)
+---
+# Autenticação do user da máquina alvo.
+ansible_user: usuario
+ansible_password: senha-do-usuario
+ansible_become_password: senha-do-usuario
