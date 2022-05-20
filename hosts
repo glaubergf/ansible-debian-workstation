@@ -1,8 +1,0 @@
-[local]
-#localhost ansible_connection=local
-lmde5 ansible_host=192.168.122.28
-
-[local:vars]
-ansible_user = "{{ ansible_user }}"
-ansible_password = "{{ ansible_password }}"
-ansible_become_password = "{{ ansible_become_password }}"
