@@ -4,7 +4,7 @@ Descrição: O objetivo desse projeto é automatizar a configuração na pós-in
            GNU/Linux Debian, bem como algumas configurações adicionais e também upgrade de versão do
            sistema, assim nos poupando tempo, esforço e trabalho braçal.
 Autor: Glauber GF (@mcnd2)
-Atualização: 2021-08-19
+Atualização: 2023-08-15
 ---
 
 ![Image](https://github.com/glaubergf/ansible-debian-workstation/blob/main/pictures/rio-de-janeiro-swirl-debian.jpg) 
@@ -13,7 +13,7 @@ Atualização: 2021-08-19
 
 O objetivo desse projeto é executar com o Ansible a configurações pós-instalação do Debian, instalando pacotes, removendo outros, adicionando repositórios, criando usuário etc.
 
-Também podemos executar o update de todos os pacotes do sistema bem como upgrade de versão do sistema, no caso da versão stable "buster" para "bullseye", assim nos poupando tempo, esforço e trabalho braçal.
+Também podemos executar o update de todos os pacotes do sistema bem como upgrade de versão do sistema, no caso da versão stable "bullseye" para "bookworm", assim nos poupando tempo, esforço e trabalho braçal.
 
 Veja os posts citando esse projeto no **SempreUpdate**:
 
@@ -25,9 +25,9 @@ Veja os posts citando esse projeto no **SempreUpdate**:
 
 O projeto inicial foi desenvolvido para automatizar uma pós-instalação do **[Debian](https://www.debian.org/)** 10.9 (Stable Buster) em um Notebook Dell Inspiron N5010 core i5 de 1ª geração (2010).
 
-Nesse projeto, foi adicionado o repositório do Debian com a seção 'contrib' e 'non-free' mais outros repositórios de terceiros para uso de aplicações pertinente as necessidades do usuário, executado também as configurações de permissão de uso da VPN, acesso a cloud AWS e mudanças no layout do Xfce4.
+Nesse projeto, foi adicionado o repositório do Debian (Bookworm) com o componente 'contrib', 'non-free' e 'non-free-firmware', além de outros repositórios de terceiros para uso de aplicações pertinente as necessidades do usuário, executado também as configurações de permissão de uso da VPN, acesso a cloud AWS e mudanças no layout do Xfce4.
 
-Nas últimas atualizações, foi adiconado a role para atualização de todos os pacotes do sistema e também outra role para executar o upgrade de versão do sistema com o lançamento da versão "Bullseye".
+Na última atualização, foi revisado todas as roles para atualização de todos os pacotes do sistema e upgrade de versão do sistema com o lançamento da versão "Bookworm".
 
 Para usar esse projeto, altere as configurações de acordo com seu cenário e necessidade de uso.
 
@@ -35,19 +35,21 @@ Para usar esse projeto, altere as configurações de acordo com seu cenário e n
 
 Veja uma breve descrição das **tasks** dentro de cada **role**.
 
-Na role **add-repo** é executado a inclusão da seção _contrib_ e _non-free_ no repositórios do Debian. Adicionado também outros reporitórios de terceiros para uso de aplicações.
+Na role **add-repo** é executado a inclusão dos componentes _contrib_ , _non-free_ e _non-free-firmware_ no repositórios do Debian. Adicionado também outros reporitórios de terceiros para uso de aplicações.
 
 * tasks:
 
 ```
-Adiconando Repositorios "contrib" e "non-free";
-Atualizando Repositorios;
+Adicionando "source.list" com componentes "contrib", "non-free" e "non-free-firmware";
+Atualizando Cache do Repositorio APT "apt-get update";
+Instalando o "Debian Keyring" para chaves GPG;
+Baixando Chaves GPG de Repositorios de Tercerios;
+Criando diretorio "/etc/apt/sources.list.d/backup" caso nao exista;
+Movendo os Repositórios de Terceiros "/etc/apt/sources.list.d/" para o diretorio "backup";
+Importando Chaves GPG de Repositorios de Terceiros e adicionando os Repositorios;
 Instalando o flatpak;
 Adicionando Repositorio Flathub Flatpak;
-Instalacao GPG-Key;
-Adicionando Keys para Validacao dos Repositorios Adicionais;
-Adiconando URLs dos Repositorios Adicionais;
-Atualizando Repositorios.
+Atualizando Repositorios;
 ```
 
 Na role **uninstall-app** é executado a remoção de algumas aplicações não necessária para o uso e alterações de outras.
@@ -55,7 +57,7 @@ Na role **uninstall-app** é executado a remoção de algumas aplicações não 
 * tasks:
 
 ```
-Removendo pacotes.
+Removendo pacotes default com não serao usados;
 ```
 
 Na role **install-app** é executado a instalação de aplicações do repositório do Debian bem como do Flatpak e pacotes '.deb' de downlaod da internet.
@@ -63,22 +65,29 @@ Na role **install-app** é executado a instalação de aplicações do repositó
 * tasks:
 
 ```
-Instalando Pacotes do Repositorio;
-Instalando Pacotes Flatpak;
-Instalando Pacotes ".deb" da Internet.
+Baixando e instalando Pacotes "Flatpak" [Postman e Drawio];
+Baixando Pacote [.deb] "VPN FortiClient" e dependencias. Aguarde ...;
+Criando uma Lista de Pacotes [.deb] para "VPN FortiClient";
+Gerando Variavel da Lista dos Pacotes para "VPN FortiClient";
+Listando os Pacotes com DEBUG;
+Instalando o "FortiClient" e suas dependencias;
+Baixando e instalando Pacote [.deb] (Franz 5.9.2). Aguarde ...;
+Instalando Aplicacoes do Repositorio APT;
+Parando e desabilitando o autostart do "AnyDesk";
+Parando e desabilitando o autostart do "FortiClient";
 ```
 
-Na role **install-loffice** é executado o download da versão do LibreOffice stable na versão 7.0.5, descompactando e instalando a mesma. Por esse motivo que o libreoffice foi removido na task _unistall-app_.
+Na role **install-loffice** é executado o download da versão do LibreOffice stable na versão 7.4.7, descompactando e instalando o mesmo. Por esse motivo que o libreoffice foi removido na task _unistall-app_.
 
 * tasks:
 
 ```
-Download do LibreOffice;
-Descompactando Pacotes do LibreOffice;
-Criando uma Lista de Pacotes .deb do LibreOffice;
-Criando Variavel da Lista dos Pacotes do LibreOffice;
-Listando os Pacotes com DEBUG;
-Instalando Pacotes .deb do LibreOffice.
+Baixando o "LibreOffice 7.4.7". Aguarde ...;
+Descompactando Pacotes do LibreOffice 7.4.7;
+Criando Lista de Pacotes [.deb] do "LibreOffice 7.4.7";
+Gerando Variavel da Lista de Pacotes do "LibreOffice 7.4.7";
+Listando os Pacotes do "LibreOffice 7.4.7" com DEBUG;
+Instalando Pacotes [.deb] do "LibreOffice 7.4.7";
 ```
 
 Na role **create-user** é executado a criação do(s) usuário(s) para uso do sistema necessitando alterar a senha padrão no primeiro acesso.
@@ -87,7 +96,7 @@ Na role **create-user** é executado a criação do(s) usuário(s) para uso do s
 
 ```
 Criando Conta de Usuario(s);
-Forca o Usuario a Alterar a Senha no Primeiro Login.
+Forca o Usuario a Alterar a Senha no Primeiro Login;
 ```
 
 Na role **aws-cli** é executado a instalação de pacotes necessários e configuração para acesso e manipulação na AWS.
@@ -107,32 +116,40 @@ $ ansible-playbook --ask-vault-pass -i hosts main.yml -t aws_cli
 
 ```
 Instalando o Python3 PIP;
-Instalando o boto via PIP;
-Instalando a AWS CLI;
-Executando AWS Configure inserindo Id, Key, Region e formato no profile Default
-Criando o diretório ~/.ssh caso nao exista;
+Verificar se o arquivo "EXTERNALLY-MANAGED" existe;
+O arquivo EXISTE;
+O arquivo NAO EXISTE;
+Renomeando o arquivo "EXTERNALLY-MANAGED";
+Instalando o "boto e awscli" via PIP. Aguarde ...;
+Criando diretorio "/home/$user/.aws" caso nao exista
+Criando arquivo de "Credencias da AWS";
+Criando arquivo de "Configuracao da AWS";
+Testando a "AWS CLI (aws --version)";
+Resultado do "teste AWS CLI";
+Criando diretorio "/home/$user/.ssh" caso nao exista;
 Copiando a chave ssh de acesso na AWS;
-Configurando o .bashrc awsgo/alog (SSH) e data no historico.
+Configurando o ".bashrc" com registro de "data e hora" no comando "history"
 ```
 
-Na role **conf-all** é executado algumas configurações no sistema como alterar a permissão de conexão com a VPN, backup e modificação do layout do xfce4 com um template, cópia de diretório específico replicando no seu nome com data, e download de temas de ícones, fontes e imagens para área de trabalho, assim sendo identificado no sistema.
+Na role **conf-all** é executado algumas configurações no sistema como backup e modificação do layout do Xfce4 com template, cópia de diretório específico replicando no seu nome com data, e download de temas de ícones, fontes e imagens para área de trabalho, assim sendo identificado no sistema.
 
 * tasks:
 
 ```
-Adicionando permissão para o usuario conectar a VPN com o OpenFortiGUI;
-Backup do .config/xfce4 do usuário;
+Backup do ".config/xfce4" do usuario;
 Copiando template do Painel do xfce4;
-Download dos pacotes de temas de icones Ardis e Nitrux;
-Descompactando os pacotes de temas de icones Ardis e Nitrux;
-Copiando os diretorios de temas de icones para o /usr/share/icons;
-Download do pacote de fontes Ubuntu;
-Descompactando o pacote de fontes Ubuntu;
-Copiando os diretorios de fontes Ubuntu para o /usr/share/fonts;
-Criando diretorio ~/Imagens/wallpaper se não existir;
-Download papel de parede Pexels;
-Copiando diretorio BEMOBI;
-continuando ...
+Backup do "lightdm-gtk-greeter.conf" do sistema;
+Copiando template do utilitario de configuracao de login LightDM GTK+ Greeter;
+Baixando os pacotes de temas de icones "Ardis" e "Nitrux";
+Descompactando os pacotes de temas de icones "Ardis" e "Nitrux"
+Copiando os diretorios de temas de icones para o "/usr/share/icons";
+Baixando o pacote de "fontes Ubuntu";
+Descompactando o pacote de "fontes Ubuntu";
+Copiando os diretorios de fontes Ubuntu para o "/usr/share/fonts";
+Criando diretorio "/home/$user/Imagens/wallpaper" se não existir;
+Baixando "papel de parede Pexels";
+Copiando diretorio de DADOS;
+Reiniciando o Sistema devido as mudanças de arquivos de configuracoes [xfce4-panel e lightdm];
 ```
 
 Na role **reboot-system** é executado o reboot no sistema.
@@ -148,13 +165,13 @@ Na role **update-upgrade-app** é executado a atualização de todo os pacotes d
 * tasks:
 
 ```
-Atualizando cache do repositorio 'apt-get';
-Atualizando todos os pacotes 'apt-get';
-Verificando se uma reinicializacao e necessaria para o sistema;
-Reinicializando o host Debian.
+Atualizando cache do repositorio "apt-get";
+Atualizando todos os pacotes "apt-get";
+Verificando se uma "reinicializacao" e necessaria para o sistema;
+Reboot do host Debian.
 ```
 
-Na role **dist-upgrade** é executado a parada a interface gráfica, a alteração do repositórios do Debian da versão Buster para Bullseye, comentado todos os repositorios de terceiros, a atualização de todo o cache do repositórios Bullseye, a atualização do pacote openssh-server para versão do Bullseye para dar continuidade no upgrade do sistema, o restart do serviço sshd, a atualização de todos os pacotes para a versão do bullseye, o reboot do sistema, a limpeza de cache, o autoremove de pacotes não mais necessários, descomentado os repositórios de terceiros e editado a versão do repositório de terceiro do Buster para Bullseye.
+Na role **dist-upgrade** é executado a parada a interface gráfica, a alteração do repositórios do Debian da versão Bullseye para Bookworm, comentado todos os repositorios de terceiros, a atualização de todo o cache do repositórios Bookworm, a atualização de todos os pacotes para a versão do Bookworm, o reboot do sistema, a limpeza de cache, o autoremove de pacotes não mais necessários, descomentado os repositórios de terceiros e editado a versão do repositório de terceiro do Bullseye para Bookworm.
 
 **Nota:**
 _Para executar a role **dist-upgrade**, lembre-se de executar a playbook com o parâmetro **-t** [tag] setando apenas a referida role a ser executada. Para checar a execução antes de aplicá-la, use no final do comando o parâmetro **-C** ["c" maiúsculo] conforme demostrado abaixo.
@@ -170,25 +187,24 @@ $ ansible-playbook -i hosts main.yml -t dist-upgrade -C
 
 ```
 Parando a interface grafica (GUI);
-Editando repositorios do Debian 10 "buster" para o Debian 11 "bullseye";
-Editando formato do repositorio de segurança ([buster]bullseye/updates > bullseye-security);
-Encontrando repositorios de terceiros;
-Debugando repositorios de terceiros;
-Comentando repositorios de terceiros em '/etc/apt/sources.list.d/*.list';
-Atualizando cache do repositorio 'apt-get update';
-Atualizando a versao do 'openssh-server' (bullseye) para executar o upgrade do sistema via 'ssh';
-Reiniciando o servico 'sshd';
-Atualizando todos os pacotes 'apt-get dist-upgrade';
-Verificando se e necessario uma reinicializacao do sistema;
+Editando repositorios do Debian 11 "bullseye" para o Debian 12 "bookworm";
+Adicionar componente "non-free-firmware" no repositorio "sources.list";
+Vasculhando Repositorios de Terceiros;
+Debugando Repositorios de Terceiros;
+Comentando Repositorios de Terceiros "/etc/apt/sources.list.d/*.list";
+Atualizando cache do Repositorio APT "apt-get update";
+Atualizando todos os pacotes "apt-get dist-upgrade". Aguarde ... ;
+Verificando se eh necessario uma reinicializacao do sistema;
 Reiniciando o sistema devido a atualizacao do kernel;
-Atualizando novamente o cache do repositorio 'apt-get update';
-Atualizando novamente todos os pacotes 'apt-get dist-upgrade';
-Reiniciando o sistema 'Pos-Upgrade';
-Removendo pacotes inuteis do cache do 'apt';
 Removendo dependencias de pacotes que nao sao mais necessarias;
-Lendo novamente os repositorios de terceiros;
-Descomentando repositorios de terceiros em '/etc/apt/sources.list.d/*.list;
-Editando repositorios de Terceiros de 'buster' para 'bullseye'.
+Lendo novamente os Repositorios de Terceiros;
+Descomentando Repositorios de Terceiros "/etc/apt/sources.list.d/*.list";
+Executando o 'apt-get update' direcionando para o "/root/apt-get-update.txt";
+Filtrando as Chaves GPG não disponível para o arquivo "/root/no_pubkey.txt";
+Ler o conteúdo do arquivo no_pubkey.txt;
+DEBUG;
+Importar em lotes todas as Chaves GPG ausentes;
+Atualizando Cache do Repositorio APT "apt-get update"
 ```
 
 ## Contribuindo

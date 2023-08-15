@@ -1,5 +1,4 @@
 ---
-## Remover o pacote LibreOffice existente
 #- name: Removendo pacotes Libreoffice existente
 #  apt:
 #    name: libreoffice*
@@ -9,7 +8,7 @@
 #    autoremove: yes
 #  tags: remove_loffice
 
-- name: Download do LibreOffice
+- name: Baixando o "LibreOffice 7.4.7". Aguarde ... 
   get_url:
     url: "{{ item }}"
     dest: "/tmp"
@@ -17,7 +16,7 @@
   with_items: "{{ libreoffice_url }}"
   tags: install_loffice
 
-- name: Descompactando Pacotes do LibreOffice
+- name: Descompactando Pacotes do "LibreOffice 7.4.7"
   unarchive:
     src: "{{ item }}"
     dest: "/tmp"
@@ -26,22 +25,22 @@
   with_items: "{{ lo_extract_gz }}"
   tags: install_loffice
 
-- name: Criando uma Lista de Pacotes .deb do LibreOffice
+- name: Criando Lista de Pacotes [.deb] do "LibreOffice 7.4.7"
   shell: "{{ item }}"
   with_items: "{{ create_list_deb_lo }}"
   tags: install_loffice
 
-- name : Criando Variavel da Lista dos Pacotes do LibreOffice 
+- name : Gerando Variavel da Lista de Pacotes do "LibreOffice 7.4.7"
   shell: cat /tmp/loffice-main-deb.txt
   register: list_deb_lo
   tags: install_loffice
 
-- name: Listando os Pacotes com DEBUG
+- name: Listando os Pacotes do "LibreOffice 7.4.7" com DEBUG
   debug:
     msg: "{{ list_deb_lo }}"
   tags: install_loffice
 
-- name: Instalando Pacotes .deb do LibreOffice
+- name: Instalando Pacotes [.deb] do "LibreOffice 7.4.7"
   apt:
     deb: "{{ item }}"
     force: yes

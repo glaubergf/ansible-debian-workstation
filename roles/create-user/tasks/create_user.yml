@@ -1,11 +1,11 @@
 ---
 #----- Remove User
-#- name: Removendo Conta do(s) Usuario(s)
+#- name: Removendo Conta(s) do(s) Usuario(s)
 #  user:
 #    name: "{{ item }}"
 #    state: absent
 #    remove: yes
-#  with_items: "{{ new_user }}"
+#  with_items: "{{ delete_user }}"
 #  tags: remove_user
 #-----
 

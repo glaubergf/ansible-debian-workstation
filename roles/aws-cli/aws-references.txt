@@ -1,0 +1,8 @@
+## Configurações de arquivos de configuração e credenciais 
+https://docs.aws.amazon.com/pt_br/cli/latest/userguide/cli-configure-files.html
+
+
+## Teste para validar acesso ao console da AWS.
+
+$ aws configure list
+$ aws s3 ls s3://

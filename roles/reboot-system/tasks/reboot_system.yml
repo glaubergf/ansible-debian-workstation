@@ -1,13 +1,12 @@
 ---
 
-#- name: Reiniciando o sistema com todos os padrões $(lsb_release -c)
-#  reboot:
-#    msg: "Reinicialização iniciada pelo Ansible"
-#  tags: reboot_system
+- name: Reiniciando o sistema com todos os padrões
+  reboot:
+  tags: reboot_system
 
-- name: Desligando o sistema com todos os padrões
-  command: /sbin/shutdown -h now
-  #sudo: yes
+#- name: Desligando o sistema com todos os padrões
+#  command: /sbin/shutdown -h now
+#  sudo: yes
 
 #- name: wait go down
 #  local_action: wait_for host={{ ansible_ssh_host }} port=22 state=stopped

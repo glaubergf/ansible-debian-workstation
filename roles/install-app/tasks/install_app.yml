@@ -1,12 +1,5 @@
 ---
-- name: Instalando Pacotes do Repositorio
-  apt:
-    name: "{{ item }}"
-    state: present
-  loop: "{{ apps }}"
-  tags: install_app
-
-- name: Instalando Pacotes Flatpak
+- name: Baixando e instalando Pacotes "Flatpak" [Postman e Drawio]
   flatpak:
     name: "{{ item }}"
     state: present
@@ -14,9 +7,59 @@
   with_items: "{{ flatpak_apps }}"
   tags: install_app
 
-- name: Instalando Pacotes ".deb" da Internet
+- name: Baixando Pacote [.deb] "VPN FortiClient" e dependencias. Aguarde ... 
+  get_url:
+    url: "{{ item }}"
+    dest: "/tmp"
+    mode: "0755"
+  with_items: "{{ fc_dep_url }}"
+  tags: install_app
+
+- name: Criando uma Lista de Pacotes [.deb] para "VPN FortiClient"
+  shell: "{{ item }}"
+  with_items: "{{ create_list_deb_fc }}"
+  tags: install_app
+
+- name : Gerando Variavel da Lista dos Pacotes para "VPN FortiClient"
+  shell: cat /tmp/forticlient-main-deb.txt
+  register: list_deb_fc
+  tags: install_app
+
+- name: Listando os Pacotes com DEBUG
+  debug:
+    msg: "{{ list_deb_fc }}"
+  tags: install_app
+
+- name: Instalando o "FortiClient" e suas dependencias
+  apt:
+    deb: "{{ item }}"
+    force: yes
+  with_items: "{{ list_deb_fc.stdout_lines }}"
+  tags: install_app
+
+- name: Baixando e instalando Pacote [.deb] (Franz 5.9.2). Aguarde ...
   apt:
     deb: "{{ item }}"
   loop: "{{ deb_apps }}"
-  tags: install_app1
-  
+  tags: install_app
+
+- name: Instalando Aplicacoes do Repositorio APT
+  apt:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ apps }}"
+  tags: install_app
+
+- name: Parando e desabilitando o autostart do "AnyDesk"
+  systemd:
+    name: anydesk
+    state: stopped
+    enabled: no
+  tags: install_app
+
+- name: Parando e desabilitando o autostart do "FortiClient"
+  systemd:
+    name: forticlient-scheduler
+    state: stopped
+    enabled: no
+  tags: install_app

@@ -27,8 +27,9 @@
             <value type="uint" value="65535"/>
           </property>
           <property name="image-style" type="int" value="3"/>
-          <property name="last-image" type="string" value="/home/mcnd2/Imagens/wallpaper/pexels-negative-space-97077.jpg"/>
+          <property name="last-image" type="string" value="/home/mcnd2/Imagens/wallpaper/pexels-snapwire-730896.jpg"/>
           <property name="backdrop-cycle-enable" type="bool" value="true"/>
+          <property name="backdrop-cycle-timer" type="uint" value="1"/>
         </property>
         <property name="workspace1" type="empty">
           <property name="color-style" type="int" value="0"/>
@@ -150,15 +151,30 @@
           <property name="image-style" type="int" value="5"/>
         </property>
       </property>
+      <property name="monitorVirtual-1" type="empty">
+        <property name="workspace0" type="empty">
+          <property name="color-style" type="int" value="1"/>
+          <property name="image-style" type="int" value="3"/>
+          <property name="last-image" type="string" value="/home/mcnd2/Imagens/wallpaper/pexels-pixabay-289586.jpg"/>
+          <property name="backdrop-cycle-enable" type="bool" value="false"/>
+        </property>
+        <property name="workspace1" type="empty">
+          <property name="color-style" type="int" value="1"/>
+          <property name="image-style" type="int" value="3"/>
+          <property name="last-image" type="string" value="/home/glauber.fonseca/Imagens/pinguim.jpg"/>
+          <property name="backdrop-cycle-enable" type="bool" value="true"/>
+        </property>
+      </property>
     </property>
     <property name="single-workspace-mode" type="bool" value="false"/>
+    <property name="single-workspace-number" type="int" value="0"/>
   </property>
   <property name="desktop-icons" type="empty">
     <property name="file-icons" type="empty">
       <property name="show-filesystem" type="bool" value="false"/>
       <property name="show-removable" type="bool" value="false"/>
     </property>
-    <property name="icon-size" type="uint" value="48"/>
+    <property name="icon-size" type="uint" value="36"/>
     <property name="tooltip-size" type="double" value="80.000000"/>
     <property name="use-custom-font-size" type="bool" value="true"/>
     <property name="show-hidden-files" type="bool" value="false"/>
@@ -170,7 +186,7 @@
   </property>
   <property name="last" type="empty">
     <property name="window-width" type="int" value="856"/>
-    <property name="window-height" type="int" value="556"/>
+    <property name="window-height" type="int" value="558"/>
   </property>
   <property name="desktop-menu" type="empty">
     <property name="show" type="bool" value="false"/>

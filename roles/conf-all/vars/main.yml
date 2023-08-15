@@ -1,5 +1,11 @@
 ---
 # vars file for roles/conf-all
+conf_lightdm_gtk:
+  - lightdm-gtk-greeter/lightdm-gtk-greeter.conf
+  - lightdm-gtk-greeter/Gas-Soldier-with-Weapon-64x64.png
+  - lightdm-gtk-greeter/TheMandalorian_BabyYoda_StarWars.jpeg
+  #- lightdm-gtk-greeter/solarized-wallpaper-debian.png
+
 icons_url:
   - https://github.com/Nitrux/ardis-icon-theme/archive/refs/heads/master.zip
   - https://github.com/Nitrux/nitrux-icon-theme/archive/refs/heads/master.zip
@@ -34,11 +40,5 @@ pictures_rul:
   - https://www.pexels.com/photo/97077/download/ #codificacao-2
   
 copy_B:
-  - mv /tmp/BEMOBI /tmp/BEMOBI_$(date +'%Y-%m-%d')
-  - mv /tmp/BEMOBI* /home/debian/
-
-conf_lightdm_gtk:
-  - lightdm-gtk-greeter/lightdm-gtk-greeter.conf
-  - lightdm-gtk-greeter/Gas-Soldier-with-Weapon-64x64.png
-  - lightdm-gtk-greeter/TheMandalorian_BabyYoda_StarWars.jpeg
-  
+  - mv /tmp/dados /tmp/dado_$(date +'%Y%m%d_%s')
+  - mv /tmp/dados* /home/mcnd2/

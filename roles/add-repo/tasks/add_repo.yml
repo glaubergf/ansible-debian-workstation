@@ -1,21 +1,59 @@
 ---
-- name: Adiconando Repositorios "contrib" e "non-free"
+- name: Adicionando "source.list" com componentes "contrib", "non-free" e "non-free-firmware"
   copy:
     src: sources.list
     dest: /etc/apt/sources.list
     owner: root
     group: root
     mode: '0644'
-    checksum: 67f5099ee4715fbade5ec8131045f0c8e0c1363c
+    checksum: dc96f68e1ce2a293d7ad08ac2e788292e9f4c36c
     backup: yes
   tags: add_repo
 
-- name: Atualizando Repositorios
+- name: Atualizando Cache do Repositorio APT "apt-get update"
   apt:
-    update-cache: yes
+    update_cache: yes
+    force_apt_get: yes
   tags: add_repo
 
-- name: Instalando o flatpak
+- name: Instalando o "Debian Keyring" para chaves GPG
+  apt:
+    name:
+      - debian-keyring
+      - debian-archive-keyring
+      - debian-ports-archive-keyring
+      - curl
+    state: present
+  tags: add_repo
+
+- name: Baixando Chaves GPG de Repositorios de Tercerios
+  # https://manpages.debian.org/unstable/gpg/gpg.1.en.html
+  shell:
+    cmd: "{{ item }}"
+  with_items: "{{ get_key }}"
+  tags: add_repo
+
+- name: Criando diretorio "/etc/apt/sources.list.d/backup" caso nao exista
+  file:
+    path: /etc/apt/sources.list.d/backup
+    state: directory
+    owner: root
+    group: root
+    mode: '0644'
+  tags: add_repo
+
+- name: Movendo os Repositórios de Terceiros "/etc/apt/sources.list.d/" para o diretorio "backup"
+  shell: mv -b /etc/apt/sources.list.d/*.list /etc/apt/sources.list.d/backup/
+  become: yes
+  tags: add_repo
+
+- name: Importando Chaves GPG de Repositorios de Terceiros e adicionando os Repositorios
+  shell:
+    cmd: "{{ item}}"
+  with_items: "{{ import_key }}"
+  tags: add_repo
+
+- name: Instalando o Flatpak
   apt:
     name: flatpak
     state: present
@@ -28,30 +66,6 @@
     state: present
     flatpakrepo_url: https://dl.flathub.org/repo/flathub.flatpakrepo
     method: system
-  tags: add_repo
-
-- name: Instalacao GPG-Key
-  apt_key:
-    keyserver: keyserver.ubuntu.com
-    id: "{{ item }}"
-  loop: "{{ id_gpg }}"
-  tags: add_repo
-
-- name: Adicionando Keys para Validacao dos Repositorios de Terceiros
-  apt_key:
-    url: "{{ item }}"
-    state: present
-  loop: "{{ apt_key_urls }}"
-  tags: add_repo
-
-- name: Adiconando dos Repositorios de Terceiros
-  apt_repository:
-    repo: "{{ item.url }}"
-    state: present
-    filename: "{{ item.filename }}"
-    mode: '0644'
-    update_cache: no
-  loop: "{{ apt_repo_urls }}" 
   tags: add_repo
 
 - name: Atualizando Repositorios

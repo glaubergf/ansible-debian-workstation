@@ -5,7 +5,6 @@ uninstall_app:
   - exfalso
   - parole
   - atril
-  - quodlibet
   - xterm
   - libreoffice-*
-  - franz
+  - gnome-keyring

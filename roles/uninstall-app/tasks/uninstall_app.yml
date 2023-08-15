@@ -1,5 +1,5 @@
 ---
-- name: Removendo pacotes
+- name: Removendo pacotes default que nao serao usados
   apt:
     name: "{{ item }}"
     state: absent

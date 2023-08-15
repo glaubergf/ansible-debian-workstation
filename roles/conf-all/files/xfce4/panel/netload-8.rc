@@ -1,11 +1,11 @@
 Use_Label=false
-Show_Values=true
+Show_Values=false
 Show_Bars=true
 Colorize_Values=false
 Color_In=rgb(78,154,6)
 Color_Out=rgb(239,41,41)
-Text=Rede enp3s0
-Network_Device=ens1
+Text=Rede ens3
+Network_Device=ens3
 Max_In=4096
 Max_Out=4096
 Auto_Max=false

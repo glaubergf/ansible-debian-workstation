@@ -2,12 +2,12 @@
 # vars file for roles/create-user
 
 new_user:
-  - glauber.fonseca
+#  - glauber
 #  - gabriel
 #  - larissa
 
 comment_user:
-  - Glauber G Fonseca
+#  - Glauber GF
 #  - Gabriel BF
 #  - Larissa BF
 
@@ -15,5 +15,5 @@ comment_user:
 #  - zaq1
 #  - zaq1
 
-#password_user:
-#  - passwd_user.yml 
+delete_user:
+#  - teste

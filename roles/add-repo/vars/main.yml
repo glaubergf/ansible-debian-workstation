@@ -1,50 +1,27 @@
 ---
 # vars file for add-repo
-apt_key_urls:
-  - https://dl.google.com/linux/linux_signing_key.pub #GoogleChrome
-  - https://packages.microsoft.com/keys/microsoft.asc #VSCode
-  - https://keys.anydesk.com/repos/DEB-GPG-KEY #AnyDesk
-  - https://packagecloud.io/AtomEditor/atom/gpgkey #Atom
-  - https://download.spotify.com/debian/pubkey_0D811D58.gpg #Spotify
-  - https://download.docker.com/linux/debian/gpg #Docker
-  - https://apt.releases.hashicorp.com/gpg #Hashicorp
-  - https://mega.nz/linux/MEGAsync/Debian_11/Release.key #Megasync
-  - https://download.teamviewer.com/download/linux/signature/TeamViewer2017.asc #Teamviewer
 
-id_gpg:
-  - 2FAB19E7CCB7F415 #OpenFortiGUI
-  - 93C4A3FD7BB9C367 #Ansible
-  - 2F7F0DA5FD5B64B9 #Lutris
+get_key:
+  - curl https://dl.google.com/linux/linux_signing_key.pub | gpg --dearmor | sudo tee /usr/share/keyrings/google-chrome.gpg > /dev/null 2>&1 # Google Chrome
+  - curl https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor | sudo tee /usr/share/keyrings/vscode.gpg > /dev/null 2>&1 # VSCode
+  - curl https://keys.anydesk.com/repos/DEB-GPG-KEY | gpg --dearmor | sudo tee /usr/share/keyrings/anydesk.gpg > /dev/null 2>&1 # AnyDesk
+  - curl https://download.sublimetext.com/sublimehq-pub.gpg | gpg --dearmor | sudo tee /usr/share/keyrings/sublime-text.gpg > /dev/null 2>&1 # Sublime-text
+  - curl https://download.docker.com/linux/debian/gpg | gpg --dearmor | sudo tee /usr/share/keyrings/docker.gpg > /dev/null 2>&1 # Docker
+  - curl https://apt.releases.hashicorp.com/gpg | gpg --dearmor | sudo tee /usr/share/keyrings/hashicorp-archive-keyring.gpg > /dev/null 2>&1 # Hashicorp
+  - curl https://mega.nz/linux/MEGAsync/Debian_11/Release.key | gpg --dearmor | sudo tee /usr/share/keyrings/megasync.gpg > /dev/null 2>&1 # Megasync
+  - curl https://deb.volian.org/volian/scar.key | gpg --dearmor | sudo tee /usr/share/keyrings/volian.gpg > /dev/null 2>&1 # Nala
+  #- curl https://apt.iteas.at/iteas/dists/bullseye/Release.gpg | gpg --dearmor | sudo tee /usr/share/keyrings/iteas-keyring.gpg > /dev/null 2>&1 # OpenFortiGUI --> ERRO com a chave
 
-apt_repo_urls:
-  - url: deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main #GoogleChrome
-    filename: google-chrome
-  - url: deb [arch=amd64,arm64,armhf] http://packages.microsoft.com/repos/code stable main #VSCode
-    filename: vscode
-  - url: deb http://deb.anydesk.com/ all main #Anydesk
-    filename: anydesk
-  - url: deb [arch=amd64] https://packagecloud.io/AtomEditor/atom/any/ any main #Atom
-    filename: atom
-  - url: deb http://repository.spotify.com stable non-free #Spotify
-    filename: spotify
-  - url: deb https://apt.iteas.at/iteas bullseye main #OpenFortiGUI
-    filename: openfortigui
-  - url: deb [arch=amd64] https://download.docker.com/linux/debian bullseye stable #Docker
-    filename: docker
-  - url: deb http://ppa.launchpad.net/ansible/ansible/ubuntu trusty main #Ansible
-    filename: ansible
-  - url: deb http://download.opensuse.org/repositories/home:/strycore/Debian_11 ./ #Lutris
-    filename: lutris
-  ## Repository to Hashicorp: consul/nomad/packer/terraform/vagrant/vault/waypoint
-  ## Ao habilitar esse repositório será instalado a versão mais recente
-  ## no sistema. Caso tenha VM criada com a versão estável do Debian 
-  ## o provider não será gerenciado pelo Vagrant.
-  ## Ainda não suporta a versão Bullseye.
-  #- url: deb [arch=amd64] https://apt.releases.hashicorp.com bullseye main #Hashicorp
-  #  filename: hashicorp
-  - url: deb https://mega.nz/linux/MEGAsync/Debian_11/ ./ #Megasync
-    filename: megasync
-  - url: deb [arch=amd64] https://packages.microsoft.com/repos/ms-teams stable main #Microsoft Teams
-    filename: ms-teams
-  - url: deb https://linux.teamviewer.com/deb stable main #Teamviewer
-    filename: teamviewer
+import_key:
+  - echo "deb [arch=amd64 signed-by=/usr/share/keyrings/google-chrome.gpg] https://dl.google.com/linux/chrome/deb/ stable main" | sudo tee /etc/apt/sources.list.d/google-chrome.list # Google Chrome
+  - echo "deb [arch=amd64,arm64,armhf signed-by=/usr/share/keyrings/vscode.gpg] http://packages.microsoft.com/repos/code stable main" | sudo tee /etc/apt/sources.list.d/vscode.list # VSCode
+  - echo "deb [signed-by=/usr/share/keyrings/anydesk.gpg] http://deb.anydesk.com/ all main" | sudo tee /etc/apt/sources.list.d/anydesk.list # Anydesk
+  - echo "deb [signed-by=/usr/share/keyrings/sublime-text.gpg] https://download.sublimetext.com/ apt/stable/" | sudo tee /etc/apt/sources.list.d/sublime-text.list # Sublime-text
+  - echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker.gpg] https://download.docker.com/linux/debian bookworm stable" | sudo tee /etc/apt/sources.list.d/docker.list # Docker
+  - echo "deb [arch=amd64 signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list # Hashicorp
+  - echo "deb [signed-by=/usr/share/keyrings/megasync.gpg] https://mega.nz/linux/MEGAsync/Debian_11/ ./" | sudo tee /etc/apt/sources.list.d/megasync.list # Megasync
+  - echo "deb [signed-by=/usr/share/keyrings/volian.gpg] https://deb.volian.org/volian/ scar main" | sudo tee /etc/apt/sources.list.d/volian-archive-scar-unstable.list # Nala
+  #- echo "deb [arch=amd64 signed-by=/usr/share/keyrings/iteas-keyring.gpg] https://apt.iteas.at/iteas bullseye main" | sudo tee /etc/apt/sources.list.d/iteas.list # OpenFortiGUI --> ERRO com a chave
+
+#sed_no_pubkey:
+#  - sed -n 's/.*NO_PUBKEY //p' /root/apt-get-update.txt > /root/no_pubkey.txt

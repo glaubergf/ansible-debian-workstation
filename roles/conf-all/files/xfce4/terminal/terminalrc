@@ -34,4 +34,6 @@ ColorCursorUseDefault=FALSE
 ColorCursorForeground=#efef29292929
 ColorCursor=#fcfce9e94f4f
 ScrollingUnlimited=TRUE
+MiscSearchDialogOpacity=100
+MiscShowUnsafePasteDialog=TRUE
 

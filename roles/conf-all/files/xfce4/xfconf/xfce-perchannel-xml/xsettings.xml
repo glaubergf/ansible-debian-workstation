@@ -35,5 +35,10 @@
     <property name="CursorThemeName" type="string" value="gruppled_white_lite"/>
     <property name="CursorThemeSize" type="empty"/>
     <property name="DecorationLayout" type="string" value=":minimize,maximize,close"/>
+    <property name="DialogsUseHeader" type="empty"/>
+    <property name="TitlebarMiddleClick" type="empty"/>
+  </property>
+  <property name="Gdk" type="empty">
+    <property name="WindowScalingFactor" type="empty"/>
   </property>
 </channel>

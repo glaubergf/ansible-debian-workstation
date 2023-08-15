@@ -1,0 +1,5 @@
+# vars file for hosts (inventory) [server / server:vars]
+---
+ansible_user: xxxxxxx
+ansible_password: xxxxxxxxxxx
+ansible_become_password: xxxxxxxxxxx

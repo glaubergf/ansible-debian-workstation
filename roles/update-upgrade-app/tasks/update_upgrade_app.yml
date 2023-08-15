@@ -1,31 +1,30 @@
 ---
-- name: Atualizando cache do repositorio 'apt-get' 
+- name: Atualizando cache do repositorio "apt-get"
   apt:
     update_cache: yes
     force_apt_get: yes
     cache_valid_time: 3600
   tags: update_upgrade_app
 
-- name: Atualizando todos os pacotes 'apt-get'
+- name: Atualizando todos os pacotes "apt-get"
   apt:
     upgrade: dist
     force_apt_get: yes
   tags: update_upgrade_app
 
-- name: Verificando se uma reinicializacao e necessaria para o sistema
+- name: Verificando se uma "reinicializacao" e necessaria para o sistema
   register: reboot_required_file 
   stat:
     path: /var/run/reboot-required
     get_md5: no
   tags: update_upgrade_app
 
-- name: Reinicializando o host Debian 
-  reboot: 
-    msg: "Reinicialização iniciada por Ansible devido a atualizações do kernel" 
-    connect_timeout: 5 
-    reboot_timeout: 300 
-    pre_reboot_delay: 0 
-    post_reboot_delay: 30 
-    test_command: uptime 
+- name: Reboot do host Debian
+  reboot:
+    connect_timeout: 5
+    reboot_timeout: 300
+    pre_reboot_delay: 0
+    post_reboot_delay: 30
+    test_command: uptime
   when: reboot_required_file.stat.exists
   tags: update_upgrade_app

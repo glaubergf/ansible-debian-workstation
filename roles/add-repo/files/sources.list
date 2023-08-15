@@ -1,18 +1,23 @@
+####################################
+# Bookworm :: Stable :: Version 12 #
+####################################
+
 #########################
-# Repositórios Oficiais #
+# Repositórios Oficiais # 
 #########################
 
-deb http://deb.debian.org/debian/ bullseye main contrib non-free
-# deb-src http://deb.debian.org/debian/ bullseye main contrib non-free
+deb http://deb.debian.org/debian/ bookworm main contrib non-free non-free-firmware
+# deb-src http://deb.debian.org/debian/ bookworm main contrib non-free non-free-firmware
 
-deb http://deb.debian.org/debian/ bullseye-updates main contrib non-free
-# deb-src http://deb.debian.org/debian/ bullseye-updates main contrib non-free
+deb http://deb.debian.org/debian/ bookworm-updates main contrib non-free non-free-firmware
+# deb-src http://deb.debian.org/debian/ bookworm-updates main contrib non-free non-free-firmware
 
-deb http://deb.debian.org/debian-security bullseye-security main contrib non-free
-# deb-src http://deb.debian.org/debian-security bullseye-security main contrib non-free
+deb http://deb.debian.org/debian-security bookworm-security main contrib non-free non-free-firmware
+# deb-src http://deb.debian.org/debian-security bookworm-security main contrib non-free non-free-firmware
 
 #########################
 # Repositório Backports #
 #########################
-# deb http://ftp.debian.org/debian bullseye-backports main contrib non-free
-# deb-src http://ftp.debian.org/debian bullseye-backports main contrib non-free
+
+# deb http://ftp.debian.org/debian bookworm-backports main contrib non-free non-free-firmware
+# deb-src http://ftp.debian.org/debian bookworm-backports main contrib non-free non-free-firmware

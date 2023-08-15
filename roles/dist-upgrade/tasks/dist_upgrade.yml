@@ -3,37 +3,35 @@
   shell: systemctl stop lightdm.service
   tags: dist_upgrade
 
-- name: Editando repositorios do Debian 10 "buster" para o Debian 11 "bullseye"
+- name: Editando repositorios do Debian 11 "bullseye" para o Debian 12 "bookworm"
   replace:
     path: "/etc/apt/sources.list"
     backup: yes
     regexp: "{{ item.From }}"
     replace: "{{ item.To }}"
   with_items:
-    - { From: 'buster', To: 'bullseye'}
+    - { From: 'bullseye', To: 'bookworm'}
   tags: dist_upgrade
 
-- name: Editando formato do repositorio de segurança ([buster]bullseye/updates > bullseye-security)
-  replace:
-    path: "/etc/apt/sources.list"
-    backup: yes
-    regexp: "bullseye/updates"
-    replace: "bullseye-security"
+- name: Adicionar componente "non-free-firmware" no repositorio "sources.list"
+  command: "{{ item }}"
+  become: yes
+  with_items: "{{ sed_sources_list }}"
   tags: dist_upgrade
 
-- name: Encontrando repositorios de terceiros
+- name: Vasculhando Repositorios de Terceiros
   find:
     paths: "/etc/apt/sources.list.d/"
     patterns: "*.list"    
   register: result_list
   tags: dist_upgrade
 
-- name: Debugando repositorios de terceiros
+- name: Debugando Repositorios de Terceiros
   debug:
     msg: "{{ result_list }}"
   tags: dist_upgrade
 
-- name: Comentando repositorios de terceiros em '/etc/apt/sources.list.d/*.list'
+- name: Comentando Repositorios de Terceiros "/etc/apt/sources.list.d/*.list"
   replace:
     path: "{{ item.path }}"
     regexp: "deb "
@@ -41,35 +39,21 @@
   with_items: "{{ result_list.files }}"
   tags: dist_upgrade
 
-- name: Atualizando cache do repositorio 'apt-get update'
+- name: Atualizando cache do Repositorio APT "apt-get update"
   apt:
     update_cache: yes
     force_apt_get: yes
   tags: dist_upgrade
 
-- name: Atualizando a versao do 'openssh-server' (bullseye) para executar o upgrade do sistema via 'ssh'
-  apt:
-    name: openssh-server
-    state: latest
-  tags: dist_upgrade
-
-- name: Reiniciando o servico 'sshd'
-  # Nota de lançamento Debian 11 (bullseye):
-  # openssh-server: não consegue reiniciar sshd restart após atualização para a 'versão 8.1p1-2'
-  # https://bugs.debian.org/948318
-  service:
-    name: sshd
-    state: restarted
-  tags: dist_upgrade
-
-- name: Atualizando todos os pacotes 'apt-get dist-upgrade'
+- name: Atualizando todos os pacotes "apt-get dist-upgrade". Aguarde ... 
   apt:
     upgrade: dist
     force_apt_get: yes
     state: latest
+  #ignore_errors: yes
   tags: dist_upgrade
 
-- name: Verificando se e necessario uma reinicializacao do sistema
+- name: Verificando se eh necessario uma reinicializacao do sistema
   register: reboot_required_file 
   stat:
     path: /var/run/reboot-required
@@ -86,57 +70,60 @@
   when: reboot_required_file.stat.exists
   tags: dist_upgrade
 
-- name: Atualizando novamente o cache do repositorio 'apt-get update'
-  apt:
-    update_cache: yes
-    force_apt_get: yes
-  tags: dist_upgrade
-
-- name: Atualizando novamente todos os pacotes 'apt-get dist-upgrade'
-  # Nota de lançamento Debian 11 (bullseye):
-  # As atualizações que envolvam libgc1c2 necessitam de duas execuções.
-  # https://bugs.debian.org/988963
-  apt:
-    upgrade: dist
-    force_apt_get: yes
-    state: latest
-  tags: dist_upgrade
-
-- name: Reiniciando o sistema 'Pos-Upgrade'
-  reboot:
-  tags: dist_upgrade
-
-- name: Removendo pacotes inuteis do cache do 'apt'
-  apt:
-    autoclean: yes
-  tags: dist_upgrade
-
 - name: Removendo dependencias de pacotes que nao sao mais necessarias
   apt:
     autoremove: yes
   tags: dist_upgrade
 
-- name: Lendo novamente os repositorios de terceiros
+- name: Lendo novamente os Repositorios de Terceiros
   find:
     paths: "/etc/apt/sources.list.d/"
     patterns: "*.list"    
   register: result_list1
   tags: dist_upgrade
 
-- name: Descomentando repositorios de terceiros em '/etc/apt/sources.list.d/*.list'
+- name: Descomentando Repositorios de Terceiros "/etc/apt/sources.list.d/*.list"
   replace:
     path: "{{ item.path }}"
     regexp: '#deb '
     replace: 'deb '
   with_items:
-    - "{{result_list1.files }}"
-  tags: dist_upgrade
-
-- name: Editando repositorios de Terceiros de 'buster' para 'bullseye'
-  replace:
-    path: "{{ item.path }}"
-    regexp: 'buster'
-    replace: 'bullseye'
-  with_items:
     - "{{ result_list1.files }}"
   tags: dist_upgrade
+
+- name: Executando o 'apt-get update' direcionando para o "/root/apt-get-update.txt"
+  shell:
+    cmd: "apt-get update > /root/apt-get-update.txt" 
+  become: yes
+  tags: dist_upgrade
+
+- name: Filtrando as Chaves GPG não disponível para o arquivo "/root/no_pubkey.txt"
+  shell:
+    cmd: "{{ item }}"
+  become: yes
+  with_items: "{{ sed_no_pubkey }}"
+  tags: dist_upgrade
+
+- name: Ler o conteúdo do arquivo no_pubkey.txt
+  command: cat /root/no_pubkey.txt
+  register: no_pubkey
+  tags: dist_upgrade
+
+- name: DEBUG
+  debug:
+    msg: "{{ no_pubkey | regex_replace('\n') }}"
+  tags: dist_upgrade
+
+- name: Importar em lotes todas as Chaves GPG ausentes
+  apt_key:
+    keyserver: keyserver.ubuntu.com
+    id: "{{ item }}"
+  with_items: "{{ no_pubkey.stdout_lines }}"
+  tags: dist_upgrade
+
+- name: Atualizando Cache do Repositorio APT "apt-get update"
+  apt:
+    update_cache: yes
+    force_apt_get: yes
+  tags: dist_upgrade
+  

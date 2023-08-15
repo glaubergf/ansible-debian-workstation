@@ -1,0 +1,11 @@
+---
+# vars file for dist-upgrade
+
+sed_sources_list:
+  - sed -i '9,10s/$/ non-free-firmware/' /etc/apt/sources.list
+  - sed -i '12,13s/$/ non-free-firmware/' /etc/apt/sources.list
+  - sed -i '15,16s/$/ non-free-firmware/' /etc/apt/sources.list
+  - sed -i '21,22s/$/ non-free-firmware/' /etc/apt/sources.list
+
+sed_no_pubkey:
+  - sed -n 's/.*NO_PUBKEY //p' /root/apt-get-update.txt > /root/no_pubkey.txt

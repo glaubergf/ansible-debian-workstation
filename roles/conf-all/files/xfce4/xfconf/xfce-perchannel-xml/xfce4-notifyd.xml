@@ -10,7 +10,9 @@
       <value type="string" value="google-chrome"/>
       <value type="string" value="hplip"/>
       <value type="string" value="nm-applet"/>
+      <value type="string" value="org.freedesktop.network-manager-applet"/>
       <value type="string" value="Spotify"/>
+      <value type="string" value="thunar"/>
       <value type="string" value="Thunar"/>
       <value type="string" value="Thunderbird"/>
       <value type="string" value="Transmission"/>
