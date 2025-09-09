@@ -83,7 +83,6 @@ ansible-debian-workstation
 │   │   │   ├── aws_cli.yml
 │   │   │   └── main.yml
 │   │   ├── vars
-│   │   │   ├── aws_cli.yml
 │   │   │   ├── main.yml
 │   │   │   └── template_main.yml
 │   ├── conf-all
