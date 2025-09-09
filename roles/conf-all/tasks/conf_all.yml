@@ -1,0 +1,318 @@
+---
+# Fazer backup do XFCE4 e do LightDM GTK Greeter.
+# Aplicar template mínimo (somente essencial) do XFCE4:
+#   Painel (estrutura + plugins)
+#   Configurações de aparência (tema GTK, ícones, cursor, fontes)
+#   Papel de parede e ícones da área de trabalho
+#   Config do gerenciador de janelas (xfwm4)
+# Aplicar template de configuração do LightDM GTK Greeter
+
+# Pré-requisitos
+- name: Garantir pacotes necessários
+  ansible.builtin.apt:
+    name:
+      - ca-certificates
+      - curl
+      - wget
+      - unzip
+    state: present
+    update_cache: yes
+  tags: conf_all
+
+# Backup do XFCE4 e LightDM GTK Greeter
+- name: Verificar se o diretório xfce4 existe
+  ansible.builtin.stat:
+    path: "/home/{{ ansible_user }}/.config/xfce4"
+  register: xfce4_dir
+  tags: conf_all
+
+- name: Backup do ~/.config/xfce4 (tar.gz com timestamp)
+  ansible.builtin.archive:
+    path: "/home/{{ ansible_user }}/.config/xfce4"
+    dest: "/home/{{ ansible_user }}/.config/xfce4_bkp_{{ ansible_date_time.date }}_{{ ansible_date_time.epoch }}.tar.gz"
+    format: gz
+  when: xfce4_dir.stat.exists
+  tags: conf_all
+
+- name: Verificar se o arquivo lightdm-gtk-greeter.conf existe
+  ansible.builtin.stat:
+    path: /etc/lightdm/lightdm-gtk-greeter.conf
+  register: lightdm_greeter_conf
+  tags: conf_all
+
+- name: Backup do /etc/lightdm/lightdm-gtk-greeter.conf (cópia com timestamp)
+  ansible.builtin.copy:
+    src: /etc/lightdm/lightdm-gtk-greeter.conf
+    dest: "/etc/lightdm/lightdm-gtk-greeter_{{ ansible_date_time.date }}_{{ ansible_date_time.epoch }}.conf.bak"
+    remote_src: yes
+    owner: root
+    group: root
+    mode: "0644"
+  when: lightdm_greeter_conf.stat.exists
+  tags: conf_all
+
+# Aplicar template XFCE4 e LightDM GTK Greeter
+- name: Copiar template XFCE4
+  ansible.builtin.copy:
+    src: xfce4-template-minimal.tar.gz
+    dest: "{{ template_xfce4_minimal }}"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: "0644"
+  tags: conf_all
+
+- name: Extrair template XFCE4 no diretório correto
+  ansible.builtin.unarchive:
+    src: "{{ template_xfce4_minimal }}"
+    dest: "/home/{{ ansible_user }}/.config/"
+    remote_src: yes
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: "0755"
+
+- name: Reiniciar XFCE4 serviços para aplicar mudanças
+  ansible.builtin.shell: |
+    xfce4-panel --restart
+    xfdesktop --reload
+    xfsettingsd --replace &
+  args:
+    executable: /bin/bash
+  tags: conf_all
+
+- name: Remover arquivo template XFCE4 após aplicar
+  ansible.builtin.file:
+    path: "{{ template_xfce4_minimal }}"
+    state: absent
+  tags: conf_all
+ 
+- name: Copiar templates do LightDM GTK+ Greeter
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: /etc/lightdm/
+    owner: root
+    group: root
+    mode: "0644"
+  loop: "{{ conf_lightdm_gtk }}"
+  tags: conf_all
+
+# Download e instalação de ícones e cursores
+- name: Criar diretório temporário para downloads
+  ansible.builtin.file:
+    path: /tmp/icons_and_cursors
+    state: directory
+    mode: "0755"
+  tags: conf_all
+
+- name: Baixar temas de ícones e cursores
+  ansible.builtin.get_url:
+    url: "{{ item.url }}"
+    dest: "/tmp/icons_and_cursors/{{ item.name }}"
+    mode: "0644"
+    validate_certs: true
+  register: download_icons_cursors
+  retries: 5
+  delay: 7
+  until: download_icons_cursors is succeeded
+  ignore_errors: true
+  loop: "{{ icons_url | default([]) + cursors_url | default([]) }}"
+  loop_control:
+    label: "{{ item.name }}"
+  tags: conf_all
+
+- name: Descompactar os temas em /usr/share/icons
+  ansible.builtin.unarchive:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    remote_src: yes
+    creates: "{{ item.creates }}"
+  loop: "{{ themes_extract | default([]) }}"
+  tags: conf_all
+
+- name: Copiar subpastas internas de temas para /usr/share/icons (somente onde necessário)
+  ansible.builtin.shell: |
+    shopt -s dotglob
+    changed=0
+    for subdir in /usr/share/icons/{{ item }}/*/; do
+      name=$(basename "$subdir")
+      if [ ! -d "/usr/share/icons/$name" ]; then
+        echo "Copiando $name..."
+        cp -r "$subdir" /usr/share/icons/
+        changed=1
+      else
+        echo "Ignorando $name (já existe)"
+      fi
+    done
+    echo "changed=$changed"
+  args:
+    executable: /bin/bash
+  register: result
+  changed_when: "'changed=1' in result.stdout"
+  failed_when: false
+  loop: "{{ subfolders_icons_cursors }}"
+  tags: conf_all
+
+# Aplicar tema do cursor para aplicações X11 como Firefox no home do usuário
+- name: Listar temas de cursor disponíveis
+  ansible.builtin.shell: "ls /usr/share/icons/ ~/.icons/ 2>/dev/null || true"
+  register: available_themes
+  changed_when: false
+  tags: conf_all
+
+- name: Mostrar temas encontrados
+  ansible.builtin.debug:
+    msg: "{{ available_themes.stdout_lines }}"
+  tags: conf_all
+
+- name: Criar diretório ~/.icons/default
+  ansible.builtin.file:
+    path: "/home/{{ ansible_user }}/.icons/default"
+    state: directory
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: "0755"
+  tags: conf_all
+
+- name: Criar arquivo index.theme com tema do cursor
+  ansible.builtin.copy:
+    dest: "/home/{{ ansible_user }}/.icons/default/index.theme"
+    content: |
+      [Icon Theme]
+      Inherits={{ cursor_theme }}
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: "0644"
+  tags: conf_all
+
+- name: Criar ou atualizar arquivo .Xresources com tema do cursor
+  ansible.builtin.copy:
+    dest: "/home/{{ ansible_user }}/.Xresources"
+    content: |
+      Xcursor.theme: {{ cursor_theme }}
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0644'
+  tags: conf_all
+
+# Instalação de Fontes
+- name: Baixar fontes Ubuntu
+  ansible.builtin.get_url:
+    url: "{{ item.url }}"
+    dest: "/tmp/{{ item.name }}"
+    mode: "0644"
+    validate_certs: true
+  register: download_fonts
+  retries: 5
+  delay: 7
+  until: download_fonts is succeeded
+  ignore_errors: true
+  loop: "{{ fonts_url | default([]) }}"
+  loop_control:
+    label: "{{ item.name }}"
+  tags: conf_all
+
+- name: Descompactar fontes Ubuntu
+  ansible.builtin.unarchive:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    mode: "0755"
+    remote_src: yes
+    creates: "{{ item.creates }}"
+  loop: "{{ fonts_extract | default([]) }}"
+  tags: conf_all
+
+- name: Remover pasta __MACOSX após extração (se existir)
+  ansible.builtin.file:
+    path: "/usr/share/fonts/__MACOSX"
+    state: absent
+  tags: conf_all
+
+- name: Atualizar cache de fontes
+  ansible.builtin.command: fc-cache -f -v
+  tags: conf_all
+
+# Download de Wallpapers
+- name: Criar diretório ~/Imagens/wallpapers do usuário
+  ansible.builtin.file:
+    path: "/home/{{ ansible_user }}/Imagens/wallpapers"
+    state: directory
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: "0755"
+  tags: conf_all
+
+- name: Baixar wallpapers
+  ansible.builtin.get_url:
+    url: "{{ item.url }}"
+    dest: "/home/{{ ansible_user }}/Imagens/wallpapers/{{ item.name }}"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: "0644"
+    validate_certs: true
+  register: download_wallpapers
+  retries: 5
+  delay: 7
+  until: download_wallpapers is succeeded
+  ignore_errors: true
+  loop: "{{ wallpapers_url | default([]) }}"
+  loop_control:
+    label: "{{ item.name }}"
+  tags: conf_all
+
+# Customizar o .bashrc (PS1)
+- name: Backup do .bashrc (cópia com timestamp)
+  ansible.builtin.copy:
+    src: "/home/{{ ansible_user }}/.bashrc"
+    dest: "/home/{{ ansible_user }}/.bashrc_{{ ansible_date_time.date }}_{{ ansible_date_time.epoch }}.bak"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0644'
+    remote_src: yes
+  tags: conf_all
+
+- name: Copiar script custom_bashrc.sh para o guest
+  ansible.builtin.copy:
+    src: custom_bashrc.sh
+    dest: "/home/{{ ansible_user }}/custom_bashrc.sh"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0755'
+  tags: conf_all
+
+- name: Executar script custom_bashrc.sh no guest
+  become: true
+  become_user: "{{ ansible_user }}"
+  ansible.builtin.shell: "/home/{{ ansible_user }}/custom_bashrc.sh"
+  args:
+    executable: /bin/bash
+  tags: conf_all
+
+- name: Remover script custom_bashrc.sh após aplicar
+  ansible.builtin.file:
+    path: "/home/{{ ansible_user }}/custom_bashrc.sh"
+    state: absent
+  tags: conf_all
+
+- name: Garantir 1 linha em branco antes de inserir HISTORY_TIME (no EOF)
+  ansible.builtin.replace:
+    path: "/home/{{ ansible_user }}/.bashrc"
+    regexp: '\n*\Z'
+    replace: '\n'
+  tags: conf_all
+
+- name: Inserir data e hora no histórico do bash (no EOF)
+  ansible.builtin.blockinfile:
+    path: "/home/{{ ansible_user }}/.bashrc"
+    marker: "# {mark} Ansible managed block - History Time"
+    insertbefore: EOF
+    block: |
+      # Exibe data e hora no histórico do bash
+      HISTTIMEFORMAT="$USER %d/%m/%Y %T "
+  tags: conf_all
+
+# Reiniciar sistema para aplicar mudanças
+- name: Reiniciar sistema para aplicar mudanças na interface gráfica
+  ansible.builtin.reboot:
+    msg: "Reiniciando o sistema para aplicar mudanças na interface gráfica"
+    connect_timeout: 5
+    reboot_timeout: 600
+  tags: conf_all

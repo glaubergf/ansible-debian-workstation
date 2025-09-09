@@ -1,0 +1,12 @@
+---
+# vars file for uninstall-app
+
+uninstall_app:
+  - atril
+  - exfalso
+  - firefox-esr
+  - firefox-esr-l10n-pt-br
+  - gnome-keyring
+  - libreoffice-*
+  - parole
+  - xterm

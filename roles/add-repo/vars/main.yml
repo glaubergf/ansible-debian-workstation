@@ -1,0 +1,30 @@
+---
+# vars file for add-repo
+
+get_key:
+  - { url: "https://dl.google.com/linux/linux_signing_key.pub", keyring: "/usr/share/keyrings/google-chrome.gpg" } # Google Chrome
+  - { url: "https://packages.microsoft.com/keys/microsoft.asc", keyring: "/usr/share/keyrings/microsoft.gpg" } # VSCode
+  - { url: "https://keys.anydesk.com/repos/DEB-GPG-KEY", keyring: "/usr/share/keyrings/anydesk.gpg" } # Anydesk
+  - { url: "https://download.sublimetext.com/sublimehq-pub.gpg", keyring: "/usr/share/keyrings/sublime-text.gpg" } # Sublime-text
+  - { url: "https://download.docker.com/linux/debian/gpg", keyring: "/usr/share/keyrings/docker.gpg" } # Docker
+  - { url: "https://apt.releases.hashicorp.com/gpg", keyring: "/usr/share/keyrings/hashicorp-archive-keyring.gpg" } # Hashicorp
+  - { url: "https://mega.nz/linux/repo/Debian_13/Release.key", keyring: "/usr/share/keyrings/meganz-archive-keyring.gpg" } # Megasync
+  #- { url: "https://apt.iteas.at/iteas/dists/bookworm/Release.gpg", keyring: "/usr/share/keyrings/iteas-openfortigui.gpg" } # OpenFortiGUI
+  - { url: "https://dbeaver.io/debs/dbeaver.gpg.key", keyring: "/usr/share/keyrings/dbeaver.gpg.key" } # DBeaver
+  - { url: "https://packages.mozilla.org/apt/repo-signing-key.gpg", keyring: "/usr/share/keyrings/packages.mozilla.org.asc" } # Mozilla Firefox
+
+import_key:
+  - { line: "deb [arch=amd64 signed-by=/usr/share/keyrings/google-chrome.gpg] https://dl.google.com/linux/chrome/deb/ stable main", file: "/etc/apt/sources.list.d/google-chrome.list" } # Google Chrome
+  - { line: "deb [arch=amd64,arm64,armhf signed-by=/usr/share/keyrings/microsoft.gpg] http://packages.microsoft.com/repos/code stable main", file: "/etc/apt/sources.list.d/vscode.list" } # VSCode
+  - { line: "deb [signed-by=/usr/share/keyrings/anydesk.gpg] http://deb.anydesk.com/ all main", file: "/etc/apt/sources.list.d/anydesk.list" } # Anydesk
+  - { line: "deb [signed-by=/usr/share/keyrings/sublime-text.gpg] https://download.sublimetext.com/ apt/stable/", file: "/etc/apt/sources.list.d/sublime-text.list" } # Sublime-text
+  - { line: "deb [arch=amd64 signed-by=/usr/share/keyrings/docker.gpg] https://download.docker.com/linux/debian {{ ansible_lsb.codename }} stable", file: "/etc/apt/sources.list.d/docker.list" } # Docker
+  - { line: "deb [arch=amd64 signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com {{ ansible_lsb.codename }} main", file: "/etc/apt/sources.list.d/hashicorp.list" } # Hashicorp
+  - { line: "deb [signed-by=/usr/share/keyrings/meganz-archive-keyring.gpg] https://mega.nz/linux/repo/Debian_13/ ./", file: "/etc/apt/sources.list.d/megasync.list" } # Megasync
+  #- { line: "deb [arch=amd64 signed-by=/usr/share/keyrings/iteas-keyring.gpg] https://apt.iteas.at/iteas/dists/bookworm/iteas bookworm main", file: "/etc/apt/sources.list.d/openfortigui.list" } # OpenFortiGUI
+  - { line: "deb [signed-by=/usr/share/keyrings/dbeaver.gpg.key] https://dbeaver.io/debs/dbeaver-ce /", file: "/etc/apt/sources.list.d/dbeaver.list" } # DBeaver
+  - { line: "deb [signed-by=/usr/share/keyrings/packages.mozilla.org.asc] https://packages.mozilla.org/apt mozilla main", file: "/etc/apt/sources.list.d/mozilla.list" } # Mozilla Firefox
+
+list_files:
+  - /etc/apt/sources.list.d/google-chrome.list
+  - /etc/apt/sources.list.d/megasync.list

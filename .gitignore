@@ -1,0 +1,6 @@
+## CONFIG .gitignore
+
+# Diretórios local
+security/
+
+# Arquivos local

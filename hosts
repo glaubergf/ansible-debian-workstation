@@ -1,0 +1,11 @@
+[server]
+#localhost ansible_connection=local
+#dell-inspiron-n5010 ansible_host=192.168.0.103
+#children ansible_host=192.168.0.114
+sup ansible_host=192.168.0.200
+#vm-debian-trixie ansible_host=192.168.0.203
+
+[server:vars]
+ansible_user = "{{ ansible_user }}" 
+ansible_password = "{{ ansible_password }}"
+ansible_become_password = "{{ ansible_become_password }}"

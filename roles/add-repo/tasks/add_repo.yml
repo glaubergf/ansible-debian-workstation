@@ -1,0 +1,244 @@
+---
+# Role add_repo - normalização e atualização de repositórios Debian 13 (trixie)
+
+# Detectar se já existem arquivos .sources
+- name: Verificar se existem repositórios em formato .sources
+  ansible.builtin.find:
+    paths: /etc/apt/sources.list.d
+    patterns: '*.sources'
+    file_type: file
+  register: sources_files
+  tags: add_repo
+
+- name: Definir fato se usando formato .sources
+  ansible.builtin.set_fact:
+    using_sources_format: "{{ (sources_files.files | length) > 0 }}"
+  tags: add_repo
+
+# Aplicar novo sources.list (apenas se não tiver .sources)
+- name: Aplicar novo sources.list com todos os componentes
+  ansible.builtin.copy:
+    src: sources.list
+    dest: /etc/apt/sources.list
+    owner: root
+    group: root
+    mode: '0644'
+    checksum: 2e21b60b66c1fa34ed77be500eea8832687e4728
+    backup: yes
+  when: not using_sources_format
+  tags: add_repo
+
+- name: Atualizar cache do APT (apt-get update)
+  ansible.builtin.apt:
+    update_cache: true
+    update_cache_retries: 10
+    update_cache_retry_max_delay: 10
+  ignore_errors: true
+  tags: add_repo
+
+# Pacotes necessários
+- name: Instalar pacotes keyrings, Debian e curl
+  ansible.builtin.apt:
+    name:
+      - debian-keyring
+      - debian-archive-keyring
+      - debian-ports-archive-keyring
+      - curl
+    state: present
+  tags: add_repo
+
+# Baixar chaves GPG de terceiros
+- name: Baixar e converter chaves GPG de terceiros
+  ansible.builtin.shell: "curl -fsSL {{ item.url }} | gpg --dearmor > {{ item.keyring }}"
+  loop: "{{ get_key }}"
+  loop_control:
+    label: "{{ item.url }}"
+  register: download_key
+  retries: 5
+  delay: 7
+  until: download_key is succeeded
+  tags: add_repo
+
+# Backup dos .sources antigos (para evitar duplicação)
+- name: Verificar se já existe arquivo .sources correspondente
+  ansible.builtin.stat:
+    path: "{{ item.file | regex_replace('.list$', '.sources') }}"
+  loop: "{{ import_key }}"
+  register: existing_sources
+  tags: add_repo
+
+- name: Fazer backup de arquivos .sources existentes antes de recriar
+  ansible.builtin.command:
+    cmd: mv "{{ item.stat.path }}" "{{ item.stat.path }}.bak"
+  loop: "{{ existing_sources.results }}"
+  when: item.stat.exists
+  tags: add_repo
+
+# Criar os repositórios em formato .list
+- name: Criar repositórios de terceiros (.list)
+  ansible.builtin.copy:
+    content: "{{ item.line }}"
+    dest: "{{ item.file }}"
+    owner: root
+    group: root
+    mode: '0644'
+  loop: "{{ import_key }}"
+  tags: add_repo
+
+# Instalar e configurar Flatpak
+- name: Instalar Flatpak
+  ansible.builtin.apt:
+    name: flatpak
+    state: present
+  tags: add_repo
+
+- name: Adicionar Repositório Flathub
+  community.general.flatpak_remote:
+    executable: "flatpak"
+    name: flathub
+    state: present
+    flatpakrepo_url: https://dl.flathub.org/repo/flathub.flatpakrepo
+    method: system
+  tags: add_repo
+
+# Converter para DEB822
+# https://repolib.readthedocs.io/en/latest/deb822-format.html#deb822-format 
+- name: Converter todos os repositórios (.list) para o formato DEB822 moderno (.sources)
+  ansible.builtin.command: apt modernize-sources --yes
+  tags: add_repo
+
+- name: Localizar todos os repositórios (.sources)
+  ansible.builtin.find:
+    paths: /etc/apt/sources.list.d
+    patterns: '*.sources'
+    file_type: file
+  register: sources_files
+  tags: add_repo
+
+# Atualizar "Enabled: yes" em todos os .sources
+- name: Garantir que "Enabled yes" esteja definido nos repositórios .sources
+  ansible.builtin.lineinfile:
+    path: "{{ item.path }}"
+    regexp: '^Enabled:'
+    line: 'Enabled: yes'
+    create: yes
+    insertafter: EOF
+  loop: "{{ sources_files.files }}"
+  tags: add_repo
+
+# Atualizar cache novamente e capturar erros
+- name: Atualizar cache do APT (apt-get update) e registrar saída
+  ansible.builtin.shell: apt-get update 2>&1
+  register: apt_update_result
+  changed_when: false
+  ignore_errors: true
+  tags: add_repo
+
+- name: Detectar URLs dos repositórios com erro crítico
+  ansible.builtin.set_fact:
+    problematic_repos: >-
+      {{
+        apt_update_result.stdout_lines
+        | select('match','^(E:).*http')
+        | map('regex_search','https?://[^ ]+')
+        | select('string')
+        | list
+      }}
+  tags: add_repo
+
+- name: Localizar repositórios (.sources)
+  ansible.builtin.find:
+    paths: /etc/apt/sources.list.d
+    patterns: '*.sources'
+    file_type: file
+  register: repo_sources_files
+  tags: add_repo
+
+- name: Ler conteúdo dos repositórios (.sources)
+  ansible.builtin.slurp:
+    src: "{{ item.path }}"
+  loop: "{{ repo_sources_files.files }}"
+  register: sources_contents
+  tags: add_repo
+
+- name: Inicializar lista de repositórios desabilitados
+  ansible.builtin.set_fact:
+    disabled_files: []
+  tags: add_repo
+
+# Desabilitar os repositórios problemáticos
+- name: Desabilitar repositórios com erro crítico
+  ansible.builtin.lineinfile:
+    path: "{{ item_file.path }}"
+    regexp: '^Enabled:'
+    line: 'Enabled: no'
+    insertafter: '^URIs:.*({{ repo_url | regex_escape }})'
+    create: yes
+  loop: "{{ repo_sources_files.files | product(problematic_repos) | list }}"
+  loop_control:
+    loop_var: item_combined
+  vars:
+    item_file: "{{ item_combined.0 }}"
+    repo_url: "{{ item_combined.1 }}"
+  when: >
+    repo_url in
+    (
+      sources_contents.results
+      | selectattr('item.path','equalto',item_file.path)
+      | map(attribute='content')
+      | map('b64decode')
+      | join('')
+    )
+  register: lineinfile_results
+  tags: add_repo
+
+- name: Construir lista dos repositórios desabilitados
+  ansible.builtin.set_fact:
+    disabled_files: >-
+      {{
+        lineinfile_results.results
+        | selectattr('changed', 'equalto', true)
+        | map(attribute='item_combined.0.path')
+        | unique
+      }}
+  when: lineinfile_results is defined
+  tags: add_repo
+
+- name: Listar os repositórios desabilitados
+  ansible.builtin.debug:
+    msg: |
+      Lista dos repositórios desabilitados por erro crítico:
+
+      {% for file in disabled_files %}
+        - {{ file }}
+      {% endfor %}
+      
+      Revisar posteriormente os repositórios caso necessite utilizar.
+  when: disabled_files | length > 0
+  tags: add_repo
+
+# Define o atributo imutável (chattr +i) nos repositórios .list para 
+# impedir que sejam recriados/modificados com scripts de pós-instalação
+# de pacotes como Google Chrome e MEGAsync. Usando .sources formato DEB822
+# não terá mais problema do APT acusar repositórios duplicados.
+- name: Remover arquivos .list (Google Chrome e MEGAsync) existentes (se houver)
+  file:
+    path: "{{ item }}"
+    state: absent
+  loop: "{{ list_files }}"
+  tags: add_repo
+
+- name: Criar arquivos .list (Google Chrome e MEGAsync) vazios
+  file:
+    path: "{{ item }}"
+    state: touch
+    mode: '0644'
+  loop: "{{ list_files }}"
+  tags: add_repo
+
+- name: Definir atributo imutável para os arquivos .list (Google Chrome e MEGAsync)
+  ansible.builtin.command: chattr +i {{ item }}
+  loop: "{{ list_files }}"
+  ignore_errors: true
+  changed_when: true
+  tags: add_repo

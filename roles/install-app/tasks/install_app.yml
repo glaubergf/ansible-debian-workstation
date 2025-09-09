@@ -1,0 +1,49 @@
+---
+# Instalar aplicativos dos repositórios oficiais, repositórios de terceiros,
+# arquivos python, .deb e flatpak.
+
+- name: Atualizar cache do APT (apt-get update)
+  ansible.builtin.apt:
+    update_cache: true
+    update_cache_retries: 10
+    update_cache_retry_max_delay: 10
+  ignore_errors: true
+  tags: install_app
+
+- name: Instalar aplicações dos repositórios APT. Aguarde...
+  ansible.builtin.apt:
+    name: "{{ item }}"
+    state: present
+    force: true
+  loop: "{{ apps }}"
+  ignore_errors: true
+  tags: install_app
+
+# Instalar pacote globalmente via pipx
+- name: Instalar tldr via pipx globalmente
+  ansible.builtin.command: >
+    pipx install tldr
+  environment:
+    PIPX_HOME: /usr/local/pipx
+    PIPX_BIN_DIR: /usr/local/bin
+  args:
+    creates: "/usr/local/bin/tldr"
+  tags: install_app
+
+# Instalar pacotes via flatpak
+- name: Baixar e instalar Postman e Drawio (flatpak). Aguarde...
+  community.general.flatpak:
+    name: "{{ item }}"
+    state: present
+    method: system
+  loop: "{{ flatpak_apps }}"
+  tags: install_app
+
+# Parar e desabilitar o autostart de serviços
+- name: Parar e desabilitar o autostart do Anydesk
+  ansible.builtin.systemd:
+    name: "{{ item }}"
+    state: stopped
+    enabled: false
+  loop: "{{ stop_app }}"
+  tags: install_app

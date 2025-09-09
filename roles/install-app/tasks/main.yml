@@ -1,0 +1,3 @@
+---
+# tasks file for install-app
+- ansible.builtin.include_tasks: install_app.yml

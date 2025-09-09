@@ -1,0 +1,63 @@
+---
+# Baixar e instalar LibreOffice (base + language pack + help pack)
+
+- name: Remover pacotes LibreOffice existentes
+  ansible.builtin.apt:
+    name: "libreoffice*"
+    state: absent
+    purge: true
+    autoclean: true
+    autoremove: true
+  tags: install_loffice
+
+- name: Criar diretório para LibreOffice em Downloads
+  ansible.builtin.file:
+    path: "{{ loffice_path }}"
+    state: directory
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: "0755"
+  tags: install_loffice
+
+- name: Baixar pacotes LibreOffice (.tar.gz) com verificação de checksum
+  ansible.builtin.get_url:
+    url: "{{ item.url }}"
+    dest: "{{ loffice_path }}/{{ item.url | basename }}"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0644'
+    checksum: "sha256:{{ item.sha256 }}"
+  loop: "{{ libreoffice_url }}"
+  tags: install_loffice
+
+- name: Descompactar arquivos LibreOffice
+  ansible.builtin.unarchive:
+    src: "{{ loffice_path }}/{{ item.url | basename }}"
+    dest: "{{ loffice_path }}"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    remote_src: true
+  loop: "{{ libreoffice_url }}"
+  tags: install_loffice
+
+- name: Criar lista de pacotes .deb do LibreOffice
+  shell: "{{ item }}"
+  loop: "{{ create_list_deb_lo }}"
+  tags: install_loffice
+
+- name : Registrar variavel da lista de pacotes do LibreOffice
+  shell: cat {{ loffice_path }}/loffice-main-deb.txt
+  register: list_deb_lo
+  tags: install_loffice
+
+- name: Listar os pacotes do LibreOffice com DEBUG
+  debug:
+    msg: "{{ list_deb_lo }}"
+  tags: install_loffice
+
+- name: Instalar pacotes .deb do LibreOffice
+  apt:
+    deb: "{{ item }}"
+    force: yes
+  with_items: "{{ list_deb_lo.stdout_lines }}"
+  tags: install_loffice

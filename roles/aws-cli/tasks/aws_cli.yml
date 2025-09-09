@@ -1,0 +1,118 @@
+---
+# Nota: Para executar a role 'aws-cli', lembre-se de executar com o vault,
+# pois há informações sensíveis no 'var/main.yml' onde está encriptada 
+# com o 'ansible-vault encrypt'. Use o decrypt para descriptografar.
+# Exemplo:
+# -> ansible-vault encrypt roles/aws-cli/var/main.yml
+# -> ansible-playbook --ask-vault-pass -i hosts main.yml -t aws_cli
+# -> ansible-vault decrypt roles/aws-cli/var/main.yml
+
+# Instalar o Python3-pip
+- name: Instalar Python3 pip
+  apt:
+    name: python3-pip
+    state: latest
+  tags: aws_cli
+  
+- name: Verificar se EXTERNALLY-MANAGED existe
+  stat:
+    path: /usr/lib/python3.13/EXTERNALLY-MANAGED
+  register: externally_managed
+  tags: aws_cli
+
+- name: Fazer backup do EXTERNALLY-MANAGED
+  copy:
+    src: /usr/lib/python3.13/EXTERNALLY-MANAGED
+    dest: /usr/lib/python3.13/EXTERNALLY-MANAGED.BKP
+    remote_src: yes
+  when: externally_managed.stat.exists
+  tags: aws_cli
+
+- name: Remover arquivo EXTERNALLY-MANAGED original
+  file:
+    path: /usr/lib/python3.13/EXTERNALLY-MANAGED
+    state: absent
+  when: externally_managed.stat.exists
+  tags: aws_cli
+
+# Instalação do AWS CLI / boto
+- name: Instalar boto e awscli
+  pip:
+    name:
+      - boto
+      - awscli
+    state: latest
+    executable: pip3
+  tags: aws_cli
+
+- name: Testar AWS CLI
+  command: aws --version
+  register: aws_cli_out
+  ignore_errors: true
+  tags: aws_cli
+
+- name: Mostrar versão do AWS CLI
+  debug:
+    var: aws_cli_out.stdout_lines
+  tags: aws_cli
+
+# Configurar a AWS (~/.aws)
+- name: Criar diretório ~/.aws
+  file:
+    path: "/home/{{ ansible_user }}/.aws"
+    state: directory
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0700'
+  tags: aws_cli
+
+- name: Criar arquivo de credenciais AWS com multiplos perfis
+  copy:
+    content: |
+      {% for u in aws_users %}
+      ## User {{ u.name }}
+      [{{ u.profile }}]
+      aws_access_key_id={{ u.access_key_id }}
+      aws_secret_access_key={{ u.secret_access_key }}
+
+      {% endfor %}
+    dest: "/home/{{ ansible_user }}/.aws/credentials"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0600'
+  tags: aws_cli
+
+- name: Criar arquivo de configuração AWS com multiplos perfis
+  copy:
+    content: |
+      {% for u in aws_users %}
+      ## User {{ u.name }}
+      [{{ u.profile }}]
+      region={{ u.region }}
+      output={{ u.format }}
+
+      {% endfor %}
+    dest: "/home/{{ ansible_user }}/.aws/config"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0600'
+  tags: aws_cli
+
+# Copiar chave SSH
+- name: Criar diretório ~/.ssh
+  file:
+    path: "/home/{{ ansible_user }}/.ssh"
+    state: directory
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0700'
+  tags: aws_cli
+
+- name: Copiar chave SSH
+  copy:
+    src: "/home/{{ ansible_user }}/.ssh/{{ ssh_id_rsa }}" # host
+    dest: "/home/{{ ansible_user }}/.ssh/{{ ssh_id_rsa }}" # guest
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0600'
+  tags: aws_cli

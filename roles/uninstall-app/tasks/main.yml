@@ -1,0 +1,3 @@
+---
+# tasks file for uninstall-app
+- ansible.builtin.include_tasks: uninstall_app.yml

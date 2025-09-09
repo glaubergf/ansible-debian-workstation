@@ -1,0 +1,19 @@
+---
+- hosts: server
+  become: yes
+  roles:
+  ## Atualizar release Debian 12 (Bookworm) → Debian 13 (Trixie)
+  - { role: update-upgrade-app, tags: update_upgrade_app }
+  - { role: dist-upgrade, tags: dist_upgrade }
+
+  ## Pós instalar Debian 13 (Trixie)
+  - { role: add-repo, tags: add_repo }
+  - { role: uninstall-app, tags: uninstall_app }
+  - { role: install-app, tags: install_app }
+  - { role: install-loffice, tags: install_loffice }
+  - { role: conf-all, tags: conf_all }
+  - { role: aws-cli, tags: aws_cli }
+
+  ## Administrar sistema
+  #- { role: create-user, tags: create_user }
+  #- { role: remove-user, tags: remove_user }

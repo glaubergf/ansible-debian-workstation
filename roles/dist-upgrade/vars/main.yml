@@ -1,0 +1,11 @@
+---
+# vars file for dist-upgrade
+
+act_gui_service: systemctl list-units --type=service --state=running | egrep -o '{{ gui_services | join("|") }}' | head -n 1
+
+gui_services:
+  - gdm
+  - gdm3
+  - lightdm
+  - sddm
+  - kdm

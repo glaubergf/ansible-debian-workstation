@@ -1,0 +1,33 @@
+---
+# Atualiza cache do APT e atualiza (upgrade) todos os pacotes
+
+- name: Atualizar cache do APT (apt-get update)
+  ansible.builtin.apt:
+    update_cache: true
+    force_apt_get: true
+    cache_valid_time: 3600
+  changed_when: false
+  ignore_errors: true
+  tags: update_upgrade_app
+
+- name: Atualizar todos os pacotes (apt-get upgrade). Aguarde...
+  ansible.builtin.apt:
+    upgrade: dist
+    force_apt_get: true
+  tags: update_upgrade_app
+
+- name: Verificar necessidade de reiniciar o sistema operacional
+  register: reboot_required_file 
+  stat:
+    path: /var/run/reboot-required
+  tags: update_upgrade_app
+
+- name: Reiniciar o sistema operacional (se necessário)
+  ansible.builtin.reboot:
+    connect_timeout: 5
+    reboot_timeout: 300
+    pre_reboot_delay: 0
+    post_reboot_delay: 30
+    test_command: uptime
+  when: reboot_required_file.stat.exists
+  tags: update_upgrade_app

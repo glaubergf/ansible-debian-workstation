@@ -1,0 +1,15 @@
+---
+# Debug para verificar quais usuários serão removidos
+- name: Debug delete_user
+  debug:
+    var: delete_user
+  tags: remove_user
+
+# Remover contas de usuários
+- name: Remover contas de usuários
+  ansible.builtin.user:
+    name: "{{ item }}"
+    state: absent
+    remove: true
+  loop: "{{ delete_user | default([]) }}"
+  tags: remove_user

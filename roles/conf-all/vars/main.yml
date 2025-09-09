@@ -1,0 +1,53 @@
+---
+# vars file for roles/conf-all
+template_xfce4_minimal: "/home/{{ ansible_user }}/xfce4-template-minimal.tar.gz"
+template_xfce4_full: "/home/{{ ansible_user }}/xfce4-template-full.tar.gz"
+
+conf_lightdm_gtk:
+  - lightdm-gtk-greeter/lightdm-gtk-greeter.conf
+  - lightdm-gtk-greeter/Gas-Soldier-with-Weapon-64x64.png
+  - lightdm-gtk-greeter/TheMandalorian_BabyYoda_StarWars.jpeg
+  - lightdm-gtk-greeter/solarized-wallpaper-debian.png
+
+subfolders_icons_cursors:
+  - nitrux-icon-theme-master
+  - gruppled-lite-cursors-main
+
+icons_url:
+  - { url: "https://github.com/Nitrux/ardis-icon-theme/archive/refs/heads/master.zip", name: "ardis-icon-theme-master.zip" }
+  - { url: "https://github.com/Nitrux/nitrux-icon-theme/archive/refs/heads/master.zip", name: "nitrux-icon-theme-master.zip" }
+
+cursors_url:
+  - { url: "https://github.com/nim65s/gruppled-lite-cursors/archive/refs/heads/main.zip", name: "gruppled-lite-cursors-main.zip" }
+  - { url: "https://github.com/ful1e5/Bibata_Cursor/releases/download/v2.0.7/Bibata-Modern-Ice.tar.xz", name: "Bibata-Modern-Ice.tar.xz" }
+  - { url: "https://github.com/ful1e5/Bibata_Cursor/releases/download/v2.0.7/Bibata-Modern-Classic.tar.xz", name: "Bibata-Modern-Classic.tar.xz" }
+  - { url: "https://github.com/ful1e5/Bibata_Cursor/releases/download/v2.0.7/Bibata-Original-Classic.tar.xz", name: "Bibata-Original-Classic.tar.xz" }
+  - { url: "https://github.com/ful1e5/Bibata_Cursor/releases/download/v2.0.7/Bibata-Original-Ice.tar.xz", name: "Bibata-Original-Ice.tar.xz" }
+
+themes_extract:
+  - { src: "/tmp/icons_and_cursors/ardis-icon-theme-master.zip", dest: "/usr/share/icons", creates: "/usr/share/icons/ardis-icon-theme-master" }
+  - { src: "/tmp/icons_and_cursors/nitrux-icon-theme-master.zip", dest: "/usr/share/icons", creates: "/usr/share/icons/nitrux-icon-theme-master" }
+  - { src: "/tmp/icons_and_cursors/gruppled-lite-cursors-main.zip", dest: "/usr/share/icons", creates: "/usr/share/icons/gruppled-lite-cursors-main" }
+  - { src: "/tmp/icons_and_cursors/Bibata-Modern-Ice.tar.xz", dest: "/usr/share/icons", creates: "/usr/share/icons/Bibata-Modern-Ice" }
+  - { src: "/tmp/icons_and_cursors/Bibata-Modern-Classic.tar.xz", dest: "/usr/share/icons", creates: "/usr/share/icons/Bibata-Modern-Classic" }
+  - { src: "/tmp/icons_and_cursors/Bibata-Original-Classic.tar.xz", dest: "/usr/share/icons", creates: "/usr/share/icons/Bibata-Original-Classic" }
+  - { src: "/tmp/icons_and_cursors/Bibata-Original-Ice.tar.xz", dest: "/usr/share/icons", creates: "/usr/share/icons/Bibata-Original-Ice" }
+
+fonts_url:
+  - { url: "https://assets.ubuntu.com/v1/0cef8205-ubuntu-font-family-0.83.zip", name: "0cef8205-ubuntu-font-family-0.83.zip" }
+
+fonts_extract:
+  - { src: "/tmp/0cef8205-ubuntu-font-family-0.83.zip", dest: "/usr/share/fonts", creates: "/usr/share/fonts/ubuntu-font-family-0.83" }
+
+cursor_theme: "Bibata-Modern-Ice"
+
+wallpapers_url:
+  - { url: "https://images.pexels.com/photos/97082/weimaraner-puppy-dog-snout-97082.jpeg", name: "cachorro.jpg" }
+  - { url: "https://images.pexels.com/photos/730896/pexels-photo-730896.jpeg", name: "gato.jpg" }
+  - { url: "https://images.pexels.com/photos/289586/pexels-photo-289586.jpeg", name: "pedras.jpg" }
+  - { url: "https://images.pexels.com/photos/585758/pexels-photo-585758.jpeg", name: "cristoredentor-sol.jpg" }
+  - { url: "https://images.pexels.com/photos/1036635/pexels-photo-1036635.jpeg", name: "bitcoin.jpg" }
+  - { url: "https://images.pexels.com/photos/169573/pexels-photo-169573.jpeg", name: "codificacao.jpg" }
+  - { url: "https://images.pexels.com/photos/276724/pexels-photo-276724.jpeg", name: "casa-interior.jpg" }
+
+custom_ps1: PS1="┌──────── \[\e[0;36m[\u@\h]\e[m\] \[\e[0;35m[\t]\e[m\] \[\e[1;33m[\w]\e[m\] ➤ \`if [ \$? = 0 ]; then echo -e '\e[32m😀 ✔\e[m' ; else echo '\e[31m🙁 ✘\e[m' ; fi\` \n└─── ➤➤➤ \$ "

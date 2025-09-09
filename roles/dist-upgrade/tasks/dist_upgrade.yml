@@ -1,0 +1,261 @@
+---
+# Upgrade de release e modernização dos repositórios no formato DEB822.
+
+# Detectar e parar a GUI ativa
+- name: Detectar serviço ativo de interface gráfica
+  ansible.builtin.shell: "{{ act_gui_service }}"
+  register: active_gui
+  changed_when: false
+  tags: dist_upgrade
+
+- name: Parar GUI ativa (se houver)
+  ansible.builtin.service:
+    name: "{{ active_gui.stdout }}"
+    state: stopped
+  when: active_gui.stdout != ""
+  ignore_errors: true
+  tags: dist_upgrade
+
+# Atualizar sources.list para nova versão
+- name: Substituir repositório Bookworm por Trixie no sources.list
+  ansible.builtin.replace:
+    path: /etc/apt/sources.list
+    regexp: 'bookworm'
+    replace: 'trixie'
+  tags: dist_upgrade
+
+# Localizar e desabilitar repositórios de terceiros .list
+- name: Localizar repositórios de terceiros (.list)
+  ansible.builtin.find:
+    paths: /etc/apt/sources.list.d
+    patterns: "*.list"
+  register: repo_list_files
+  tags: dist_upgrade
+
+- name: Exibir repositórios de terceiros (.list)
+  ansible.builtin.debug:
+    var: repo_list_files.files
+  tags: dist_upgrade
+
+- name: Comentar repositórios de terceiros para upgrade de release
+  ansible.builtin.replace:
+    path: "{{ item.path }}"
+    regexp: '^(deb|deb-src)'
+    replace: '#\g<0>'
+  loop: "{{ repo_list_files.files }}"
+  when: repo_list_files.matched > 0
+  tags: dist_upgrade
+
+# Detectar disco do Grub e evitar interação durante upgrade
+- name: Garantir que debconf-utils esteja instalado
+  ansible.builtin.apt:
+    name: debconf-utils
+    state: present
+    update_cache: true
+  tags: dist_upgrade
+
+- name: Detectar disco de boot ou raiz para configurar GRUB (compatível com NVMe, LVM, etc)
+  ansible.builtin.shell: |
+    BOOT_DEV=$(findmnt -n -o SOURCE /boot 2>/dev/null || findmnt -n -o SOURCE /)
+    DISK=$(lsblk -no pkname "$BOOT_DEV" 2>/dev/null)
+    echo "/dev/$DISK"
+  register: grub_disk
+  changed_when: false
+  tags: dist_upgrade
+
+- name: Exibir disco detectado
+  ansible.builtin.debug:
+    msg: "Disco detectado para instalar o GRUB: {{ grub_disk.stdout }}"
+  tags: dist_upgrade
+
+- name: Pré-configurar o GRUB para não-interativo
+  ansible.builtin.shell: |
+    echo "grub-pc grub-pc/install_devices multiselect {{ grub_disk.stdout }}" | debconf-set-selections
+  args:
+    executable: /bin/bash
+  tags: dist_upgrade
+
+# Atualizar todos os pacotes para a nova release
+- name: Atualizar cache do APT (apt-get update)
+  ansible.builtin.apt:
+    update_cache: true
+    force_apt_get: true
+    cache_valid_time: 3600
+  tags: dist_upgrade
+
+- name: Atualizar todos os pacotes para a nova release (apt-get dist-upgrade). Aguarde...
+  ansible.builtin.apt:
+    upgrade: dist
+    force_apt_get: true
+    state: latest
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+  ignore_errors: true
+  tags: dist_upgrade
+
+- name: Reiniciar o sistema para aplicar as mudanças
+  ansible.builtin.reboot:
+    msg: "Reiniciar após apt-get dist-upgrade"
+    connect_timeout: 300
+    reboot_timeout: 900
+    pre_reboot_delay: 10
+    post_reboot_delay: 30
+  tags: dist_upgrade
+
+- name: Remover pacotes obsoletos (apt-get autoremove)
+  ansible.builtin.apt:
+    autoremove: true
+    force_apt_get: true
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+  ignore_errors: true
+  tags: dist_upgrade
+
+# Verificar versão do sistema após reinicar
+- name: Verificar versão do Debian
+  ansible.builtin.command: lsb_release -cs
+  register: debian_version
+  changed_when: false
+  tags: dist_upgrade
+
+- name: Garantir que o sistema esteja na nova versão antes de continuar
+  ansible.builtin.assert:
+    that:
+      - (debian_version.stdout | lower) == 'trixie'
+    success_msg: "SUCESSSO! O sistema está na nova versão {{ debian_version.stdout }}."
+    fail_msg: "FALHOU! O sistema continua na versão {{ debian_version.stdout }}"
+  tags: dist_upgrade
+
+# Habilitar repositórios de terceiros .list
+- name: Descomentar linhas dos repositórios de terceiros (.list)
+  ansible.builtin.replace:
+    path: "{{ item.path }}"
+    regexp: '^#\s*(deb|deb-src)'
+    replace: '\1'
+  loop: "{{ repo_list_files.files }}"
+  when: repo_list_files.matched > 0
+  tags: dist_upgrade
+
+# Atualizar repositórios de terceiros para nova versão (bookworm → trixie)
+- name: Substituir Bookworm por Trixie nos repositórios de terceiros (.list)
+  ansible.builtin.replace:
+    path: "{{ item.path }}"
+    regexp: 'bookworm'
+    replace: 'trixie'
+  loop: "{{ repo_list_files.files }}"
+  when: repo_list_files.matched > 0
+  tags: dist_upgrade
+
+# Modernizar todos os repositórios para o formato DEB822 (.list → .sources)
+# https://repolib.readthedocs.io/en/latest/deb822-format.html#deb822-format 
+- name: Modernizar todos os repositórios para o formato DEB822 (.list → .sources) de forma não-interativa
+  ansible.builtin.command: apt modernize-sources --yes
+  tags: dist_upgrade
+
+- name: Localizar todos os repositórios (.sources)
+  ansible.builtin.find:
+    paths: /etc/apt/sources.list.d
+    patterns: '*.sources'
+    file_type: file
+  register: sources_files
+  tags: dist_upgrade
+
+- name: Habilitar (Enabled yes) em todos os repositórios (.sources)
+  ansible.builtin.lineinfile:
+    path: "{{ item.path }}"
+    regexp: '^Enabled:'
+    line: 'Enabled: yes'
+    insertafter: EOF
+    create: yes
+  loop: "{{ sources_files.files }}"
+  tags: dist_upgrade
+
+# Detectar repositórios com erro crítico na URL e desabilitar
+- name: Atualizar cache do APT (update) e registrar saída
+  ansible.builtin.shell: apt-get update 2>&1
+  register: apt_update_result
+  changed_when: false
+  ignore_errors: true
+  tags: dist_upgrade
+
+- name: Detectar repositórios com erro crítico na URL
+  ansible.builtin.set_fact:
+    problematic_repos: >-
+      {{
+        apt_update_result.stdout_lines
+        | select('match','^(E:).*http')
+        | map('regex_search','https?://[^ ]+')
+        | select('string')
+        | list
+      }}
+  tags: dist_upgrade
+
+- name: Localizar repositórios (.sources)
+  ansible.builtin.find:
+    paths: /etc/apt/sources.list.d
+    patterns: '*.sources'
+    file_type: file
+  register: repo_sources_files
+  tags: dist_upgrade
+
+- name: Ler conteúdo dos repositórios (.sources)
+  ansible.builtin.slurp:
+    src: "{{ item.path }}"
+  loop: "{{ repo_sources_files.files }}"
+  register: sources_contents
+  tags: dist_upgrade
+
+- name: Garantir lista de arquivos desabilitados
+  ansible.builtin.set_fact:
+    disabled_files: []
+  tags: dist_upgrade
+
+- name: Desabilitar repositórios com erro crítico na URL
+  ansible.builtin.lineinfile:
+    path: "{{ item_file.path }}"
+    regexp: '^Enabled:'
+    line: 'Enabled: no'
+    insertafter: '^URIs:.*({{ repo_url | regex_escape }})'
+    create: yes
+  loop: "{{ repo_sources_files.files | product(problematic_repos) | list }}"
+  loop_control:
+    loop_var: item_combined
+  vars:
+    item_file: "{{ item_combined.0 }}"
+    repo_url: "{{ item_combined.1 }}"
+  when: >
+    repo_url in
+    (
+      sources_contents.results
+      | selectattr('item.path','equalto',item_file.path)
+      | map(attribute='content')
+      | map('b64decode')
+      | join('')
+    )
+  register: lineinfile_results
+  tags: dist_upgrade
+
+- name: Construir lista dos repositórios desabilitados
+  ansible.builtin.set_fact:
+    disabled_files: >-
+      {{
+        lineinfile_results.results
+        | selectattr('changed', 'equalto', true)
+        | map(attribute='item_combined.0.path')
+        | unique
+      }}
+  when: lineinfile_results is defined
+  tags: dist_upgrade
+
+- name: Listar os repositórios desabilitados
+  ansible.builtin.debug:
+    msg: |
+      Lista dos repositórios desabilitados por erro crítico:
+
+      {% for file in disabled_files %}
+        - {{ file }}
+      {% endfor %}
+      
+      Revisar posteriormente os repositórios caso necessite utilizar.
+  when: disabled_files | length > 0
+  tags: dist_upgrade

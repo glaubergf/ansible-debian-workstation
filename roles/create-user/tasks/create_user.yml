@@ -1,0 +1,27 @@
+---
+# Debug para verificar quais usuários serão criados
+- name: Debug new_user
+  debug:
+    var: new_user
+  tags: create_user
+
+# Criar conta de usuários
+- name: Criar conta de usuários
+  ansible.builtin.user:
+    name: "{{ item.0 }}"
+    groups: sudo
+    comment: "{{ item.1 }}"
+    password: "{{ 'debian13' | password_hash('sha512') }}"
+    create_home: true
+    state: present
+    append: true
+    shell: /bin/bash
+    update_password: on_create
+  loop: "{{ new_user | zip(comment_user) | list }}"
+  tags: create_user
+
+# Forçar alteração de senha no primeiro login (opcional)
+- name: Forçar usuários a alterar a senha no primeiro login
+  ansible.builtin.shell: chage -d 0 "{{ item }}"
+  loop: "{{ new_user | default([]) }}"
+  tags: create_user

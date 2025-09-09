@@ -1,0 +1,12 @@
+---
+# Remover pacotes que vem por default no sistema Debian (trixie)
+
+- name: Remover pacotes default que nao serão usados
+  ansible.builtin.apt:
+    name: "{{ item }}"
+    state: absent
+    purge: yes
+    autoclean: yes
+    autoremove: yes
+  loop: "{{ uninstall_app }}"
+  tags: uninstall_app

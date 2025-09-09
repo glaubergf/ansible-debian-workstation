@@ -1,0 +1,114 @@
+---
+# vars file for install-app
+
+# Pacotes a serem instalados
+apps:
+  - ansible # Automação de TI
+  - anydesk # Ferramenta para acesso remoto
+  - apt-transport-https # Suporte HTTPS para APT
+  - audacious # Reprodutor de áudio leve
+  - audacity # Editor de áudio
+  - build-essential # Pacotes essenciais para compilação de softwares
+  - chromium # Navegador web Chromium
+  - chromium-l10n # Arquivos de tradução para Chromium
+  - chrony # Implementação moderna do protocolo NTP
+  - clamtk # Interface gráfica para o antivírus ClamAV
+  - cmatrix # Efeito Matrix no terminal
+  - code # Visual Studio Code (IDE)
+  - containerd.io # Runtime para containers
+  - curl # Ferramenta de linha de comando para transferir dados via URL
+  - dbeaver-ce # Ferramenta universal para gerenciamento de bancos de dados
+  - debconf-utils # Utilitários para gerenciamento do debconf
+  - debfoster # Ferramenta para remoção interativa de pacotes não utilizados
+  - default-jre # Ambiente de execução Java padrão
+  - default-jre-headless # Ambiente de execução Java sem interface gráfica
+  - docker-ce # Docker Community Edition
+  - docker-ce-cli # CLI do Docker
+  - ethstatus # Monitoramento de interfaces de rede
+  - evince # Visualizador de documentos (PDF e outros)
+  - fastfetch # Exibe informações do sistema (substituto do Neofetch)
+  - ffmpegthumbnailer # Gerador de miniaturas para arquivos de vídeo
+  - filezilla # Cliente FTP gráfico
+  - firefox # Navegador Firefox
+  - firefox-l10n-pt-br # Tradução do Firefox para português do Brasil
+  - flameshot # Ferramenta para capturas de tela
+  - fonts-noto-color-emoji # Fonte de emojis coloridos do Google
+  - gimp # Editor de imagens avançado
+  - git # Sistema de controle de versão
+  - gnome-calculator # Calculadora do GNOME
+  - gnome-system-monitor # Monitor do sistema (processos e recursos)
+  - gnome-system-tools # Conjunto de ferramentas administrativas do sistema
+  - google-chrome-stable # Navegador Google Chrome (versão estável)
+  - gparted # Editor de partições
+  - gsmartcontrol # Monitoramento SMART para discos rígidos
+  - hardinfo # Ferramenta para informações e benchmark do sistema
+  - hplip # Driver para impressoras HP no Linux
+  - hplip-gui # Interface gráfica para HPLIP
+  - htop # Monitor interativo de processos
+  - inxi # Informações detalhadas do sistema
+  - lightdm-gtk-greeter-settings # Configuração do LightDM GTK+ Greeter
+  - lmms # Estação de trabalho de música digital
+  - lshw-gtk # Exibe informações detalhadas do hardware
+  - lutris # Plataforma de jogos para Linux
+  - makepasswd # Gerador de senhas
+  - megasync # Cliente de sincronização MEGA (nuvem)
+  - menulibre # Editor de menus para ambientes gráficos
+  - mixxx # Software de DJ para mixagem de áudio
+  - mugshot # Ferramenta para gerenciamento da conta de usuário
+  - nala # Frontend amigável para o APT
+  - ncdu # Analisador de uso de disco no terminal
+  - obs-studio # Software de gravação e transmissão ao vivo
+  - openjdk-21-jre # OpenJDK 21 (Java Runtime Environment)
+  - openjdk-21-jre-headless # OpenJDK 21 sem interface gráfica
+  - openssh-server # Servidor SSH
+  - p7zip-full # Versão completa do 7zip (compactação/descompactação)
+  - p7zip-rar # Suporte a arquivos RAR para p7zip
+  - pdfarranger # Ferramenta para reorganizar arquivos PDF
+  - pipx # Instalador de aplicativos Python isolados
+  - plank # Dock leve para Linux
+  - psensor # Monitoramento de temperatura do hardware
+  - python3-openssl # Suporte OpenSSL para Python 3
+  - python3-pip # Instalador de pacotes Python
+  - python3-setuptools # Utilitário para instalação de pacotes Python
+  - python3-venv # Ambientes virtuais Python
+  - redshift-gtk # Ajuste de temperatura de cor da tela (redução de luz azul)
+  - remmina # Cliente para acesso remoto (RDP, VNC, SSH, etc.)
+  - s-tui # Monitor de temperatura e stress test no terminal
+  - simple-scan # Digitalização de documentos
+  - sshpass # Autenticação SSH não interativa
+  - sublime-text # Editor de texto avançado
+  - terminator # Emulador de terminal avançado
+  - terraform # Infraestrutura como código (IaC)
+  - thunderbird # Cliente de e-mail
+  - thunderbird-l10n-pt-br # Tradução do Thunderbird para português do Brasil
+  - timeshift # Ferramenta para criar pontos de restauração do sistema
+  - transmission # Cliente BitTorrent
+  - tumbler-plugins-extra # Plugins extras para geração de miniaturas
+  - unrar # Extração de arquivos RAR (não livre)
+  - unrar-free # Extração de arquivos RAR (livre)
+  - unzip # Extração de arquivos ZIP
+  - vagrant # Criação e gerenciamento de ambientes de desenvolvimento virtualizados
+  - virt-manager # Gerenciador de máquinas virtuais
+  - vlc # Reprodutor multimídia (áudio e vídeo)
+  - wget # Ferramenta para download via HTTP/HTTPS/FTP
+  - whois # Ferramenta para consultas WHOIS
+  - xournal # Anotações e edição de PDFs
+  - xscreensaver # Protetor de tela para X11
+  - xscreensaver-data-extra # Arquivos adicionais para xscreensaver
+  - xscreensaver-gl # Screensavers em OpenGL para X11
+  - xscreensaver-gl-extra # Screensavers extras em OpenGL para X11
+
+flatpak_apps:
+  - com.getpostman.Postman # Postman API de desenvolvimento
+  - com.jgraph.drawio.desktop # Draw.io aplicação desktop
+
+deb_files:
+  # Franz aplicativo de mensagens - BUG de travamento
+  #- url: "https://github.com/meetfranz/franz/releases/download/v5.11.0/franz_5.11.0_amd64.deb"
+  #  name: "franz_5.11.0_amd64.deb"
+  #  sha256: "e3e1de1fd958e7fd9fb304b0ccc3ccd48765963d35cd4ee79a52ce3187dc4ac5"
+  # FortiClientVPN
+
+# Parar e desabilitar o autostart de serviços
+stop_app:
+  - anydesk

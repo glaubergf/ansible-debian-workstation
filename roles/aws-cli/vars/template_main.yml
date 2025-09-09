@@ -1,0 +1,21 @@
+---
+# vars file for roles/aws-cli
+
+# AWS Configure
+aws_users:
+  - name: glauber in glauber
+    profile: default
+    access_key_id: XXXXXXXXXXXXXXXXXXXXX
+    secret_access_key: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+    region: us-east-1
+    format: json
+
+  - name: glauber2 in glauber2
+    profile: glauber2
+    access_key_id: XXXXXXXXXXXXXXXXXXXXX
+    secret_access_key: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+    region: us-east-1
+    format: json
+
+# Copiar chave de acesso ssh
+ssh_id_rsa: desk_id_rsa

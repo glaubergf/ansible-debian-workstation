@@ -1,0 +1,22 @@
+---
+# vars file for roles/install-loffice
+
+# Diretório onde os pacotes LibreOffice serão baixados e descompactados
+loffice_path: "/home/{{ ansible_user }}/Downloads/LibreOffice"
+
+# Versão desejada do LibreOffice (19-08-2025)
+lo_version: "25.2.5"
+
+# URLs dos pacotes (base + language pack + help pack) com checksum SHA256
+libreoffice_url:
+  - url: "https://download.documentfoundation.org/libreoffice/stable/{{ lo_version }}/deb/x86_64/LibreOffice_{{ lo_version }}_Linux_x86-64_deb.tar.gz"
+    sha256: "b9460bc5285e0271330af0bc8d5d2f05bd8478d6f0b9dc7ddccbc306e420f6c9"
+  - url: "https://download.documentfoundation.org/libreoffice/stable/{{ lo_version }}/deb/x86_64/LibreOffice_{{ lo_version }}_Linux_x86-64_deb_langpack_pt-BR.tar.gz"
+    sha256: "76a8472dace2f0bd9519bb4a29bbf0fe641b415d9a6e77f162978036f32a0649"
+  - url: "https://download.documentfoundation.org/libreoffice/stable/{{ lo_version }}/deb/x86_64/LibreOffice_{{ lo_version }}_Linux_x86-64_deb_helppack_pt-BR.tar.gz"
+    sha256: "800c7dac464ac3bcdb502072eb70a5d83befc614056f1945ce62345a83e1051c"
+
+create_list_deb_lo:
+  - ls {{ loffice_path }}/LibreOffice_{{ lo_version }}*_Linux_x86-64_deb/DEBS/* > {{ loffice_path }}/loffice-main-deb.txt
+  - ls {{ loffice_path }}/LibreOffice_{{ lo_version }}*_Linux_x86-64_deb_langpack_pt-BR/DEBS/* >> {{ loffice_path }}/loffice-main-deb.txt
+  - ls {{ loffice_path }}/LibreOffice_{{ lo_version }}*_Linux_x86-64_deb_helppack_pt-BR/DEBS/* >> {{ loffice_path }}/loffice-main-deb.txt

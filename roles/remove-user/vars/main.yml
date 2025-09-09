@@ -1,0 +1,6 @@
+---
+# vars file for roles/remove-user
+
+delete_user:
+  - gabriel
+  - larissa

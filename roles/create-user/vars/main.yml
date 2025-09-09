@@ -1,0 +1,10 @@
+---
+# vars file for roles/create-user
+
+new_user:
+  - gabriel
+  - larissa
+
+comment_user:
+  - Gabriel BF
+  - Larissa BF

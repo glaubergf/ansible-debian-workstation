@@ -1,0 +1,3 @@
+---
+# tasks file for roles/conf-all
+- ansible.builtin.include_tasks: conf_all.yml
