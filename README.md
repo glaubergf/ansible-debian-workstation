@@ -83,8 +83,9 @@ ansible-debian-workstation
 │   │   │   ├── aws_cli.yml
 │   │   │   └── main.yml
 │   │   ├── vars
-│   │   │   └── main.yml
-│   │   └── aws-references.txt
+│   │   │   ├── aws_cli.yml
+│   │   │   ├── main.yml
+│   │   │   └── template_main.yml
 │   ├── conf-all
 │   │   ├── files
 │   │   │   ├── lightdm-gtk-greeter
