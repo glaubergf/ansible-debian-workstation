@@ -16,7 +16,7 @@ Atualizado: 2025-09-09
 
 ![Image](https://github.com/glaubergf/ansible-debian-workstation/blob/main/pictures/rio-de-janeiro-swirl-debian.jpg)
 
-![Image](https://github.com/glaubergf/ansible-debian-workstation/blob/main/pictures/debian-trixie-after.jpg)
+![Image](https://github.com/glaubergf/ansible-debian-workstation/blob/main/pictures/debian-trixie-after.png)
 
 ![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)
 
